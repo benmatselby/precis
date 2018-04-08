@@ -3,7 +3,7 @@ Precis
 
 [![Build Status](https://travis-ci.org/benmatselby/precis.png?branch=master)](https://travis-ci.org/benmatselby/precis)
 
-CLI application for getting information out of various systems in a neat dashboard format. This is a inspired from [@jessfraz/tdash](https://github.com/jessfraz/tdash) application
+CLI application for getting information out of various systems in a neat dashboard format. This is inspired from [@jessfraz/tdash](https://github.com/jessfraz/tdash)'s dashboard
 
 * Todays date
 * Travis CI
