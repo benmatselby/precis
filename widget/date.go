@@ -9,7 +9,7 @@ import (
 // Date renders todays date
 func Date() *termui.Par {
 
-	w := termui.NewPar(time.Now().Format("Monday, 2 January 2006 @ 15:04:05"))
+	w := termui.NewPar(time.Now().Format(" Monday, 2 January 2006 @ 15:04:05"))
 	w.Height = 3
 	w.Width = 50
 	w.TextFgColor = termui.ColorWhite
