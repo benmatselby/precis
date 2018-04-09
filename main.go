@@ -43,12 +43,19 @@ func init() {
 
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
-	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER))
-		flag.PrintDefaults()
-	}
+	flag.Usage = printUsage
 
 	flag.Parse()
+
+	if travisToken == "" || travisOwner == "" {
+		printUsage()
+		os.Exit(1)
+	}
+}
+
+func printUsage() {
+	fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER))
+	flag.PrintDefaults()
 }
 
 func main() {
