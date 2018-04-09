@@ -26,6 +26,8 @@ You are going to need to define the following environment variables
 
 * TRAVIS_CI_TOKEN
 * TRAVIS_CI_OWNER
+* GITHUB_TOKEN
+* GITHUB_OWNER
 
 `
 )
@@ -34,6 +36,9 @@ var (
 	travisToken string
 	travisOwner string
 
+	githubToken string
+	githubOwner string
+
 	interval string
 )
 
@@ -41,13 +46,16 @@ func init() {
 	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token")
 	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner")
 
+	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub authentivation token")
+	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub owner")
+
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.Usage = printUsage
 
 	flag.Parse()
 
-	if travisToken == "" || travisOwner == "" {
+	if travisToken == "" || travisOwner == "" || githubOwner == "" || githubToken == "" {
 		printUsage()
 		os.Exit(1)
 	}
@@ -109,7 +117,8 @@ func exec() {
 			termui.NewCol(12, 0, widget.Date()),
 		),
 		termui.NewRow(
-			termui.NewCol(12, 0, widget.Travis(travisToken, travisOwner)),
+			termui.NewCol(5, 0, widget.Travis(travisToken, travisOwner)),
+			termui.NewCol(7, 0, widget.Github(githubToken, githubOwner)),
 		),
 	)
 
