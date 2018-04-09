@@ -13,7 +13,20 @@ import (
 const (
 	// BANNER is rendered for the help
 	BANNER = `
+.______   .______       _______   ______  __       _______.
+|   _  \  |   _  \     |   ____| /      ||  |     /       |
+|  |_)  | |  |_)  |    |  |__   |  ,----'|  |    |   (----
+|   ___/  |      /     |   __|  |  |     |  |     \   \
+|  |      |  |\  \----.|  |____ |   ----.|  | .----)   |
+| _|      | _|  ._____||_______| \______||__| |_______/
+
 A terminal dashboard which gives an overview of useful things
+
+You are going to need to define the following environment variables
+
+* TRAVIS_CI_TOKEN
+* TRAVIS_CI_OWNER
+
 `
 )
 
