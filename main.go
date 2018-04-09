@@ -84,7 +84,7 @@ func main() {
 
 	// Handle resize
 	termui.Handle("/sys/wnd/resize", func(e termui.Event) {
-
+		exec()
 	})
 
 	go func() {
