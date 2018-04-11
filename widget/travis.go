@@ -51,7 +51,7 @@ func Travis(token string, owner string) *termui.Table {
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.Block.BorderLabel = "Travis CI builds"
+	w.Block.BorderLabel = "Travis CI builds - " + owner
 
 	w.Analysis()
 	w.SetSize()
