@@ -40,6 +40,7 @@ func Github(token string, owner string) *termui.Table {
 		}
 		prs, _, err := client.PullRequests.List(ctx, owner, repo.GetName(), opt)
 		if err != nil {
+			rows = append(rows, []string{repo.GetName(), err.Error()})
 			log.Fatal(err)
 		}
 
