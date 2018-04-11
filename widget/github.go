@@ -55,7 +55,7 @@ func Github(token string, owner string) *termui.Table {
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.Block.BorderLabel = "GitHub Pull Requests"
+	w.Block.BorderLabel = "GitHub Pull Requests - " + owner
 
 	w.Analysis()
 	w.SetSize()
