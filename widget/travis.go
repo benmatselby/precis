@@ -23,7 +23,6 @@ func Travis(token string, owner string) *termui.Table {
 	happyRows := []int{}
 
 	for _, repo := range repos {
-
 		// Trying to remove the items that are not really running in Travis CI
 		// Assume there is a better way to do this?
 		if repo.LastBuildState == "" {
@@ -42,7 +41,6 @@ func Travis(token string, owner string) *termui.Table {
 		} else {
 			happyRows = append(happyRows, len(rows)-1)
 		}
-
 	}
 
 	w := termui.NewTable()

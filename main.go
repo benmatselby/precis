@@ -26,8 +26,10 @@ You are going to need to define the following environment variables
 
 * TRAVIS_CI_TOKEN
 * TRAVIS_CI_OWNER
-* GITHUB_TOKEN
-* GITHUB_OWNER
+* VSTS_ACCOUNT
+* VSTS_PROJECT
+* VSTS_TEAM
+* VSTS_TOKEN
 
 `
 )
@@ -36,8 +38,11 @@ var (
 	travisToken string
 	travisOwner string
 
-	githubToken string
-	githubOwner string
+	vstsAccount    string
+	vstsProject    string
+	vstsTeam       string
+	vstsToken      string
+	vstsBuildCount int
 
 	interval string
 )
@@ -46,8 +51,11 @@ func init() {
 	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token")
 	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner")
 
-	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub authentication token")
-	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub owner")
+	flag.StringVar(&vstsAccount, "vsts-account", os.Getenv("VSTS_ACCOUNT"), "The Visual Studio Team Services account")
+	flag.StringVar(&vstsProject, "vsts-project", os.Getenv("VSTS_PROJECT"), "The Visual Studio Team Services project")
+	flag.StringVar(&vstsTeam, "vsts-team", os.Getenv("VSTS_TEAM"), "The Visual Studio Team Services team")
+	flag.StringVar(&vstsToken, "vsts-token", os.Getenv("VSTS_TOKEN"), "The Visual Studio Team Services auth token")
+	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
 
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
@@ -55,7 +63,7 @@ func init() {
 
 	flag.Parse()
 
-	if travisToken == "" || travisOwner == "" || githubOwner == "" || githubToken == "" {
+	if travisToken == "" || travisOwner == "" || vstsAccount == "" || vstsProject == "" || vstsTeam == "" || vstsToken == "" {
 		printUsage()
 		os.Exit(1)
 	}
@@ -118,7 +126,7 @@ func exec() {
 		),
 		termui.NewRow(
 			termui.NewCol(5, 0, widget.Travis(travisToken, travisOwner)),
-			termui.NewCol(7, 0, widget.Github(githubToken, githubOwner)),
+			termui.NewCol(7, 0, widget.VstsBuilds(vstsToken, vstsAccount, vstsProject, vstsTeam, vstsBuildCount)),
 		),
 	)
 

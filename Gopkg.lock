@@ -8,6 +8,12 @@
   revision = "f849ce748f418a10bbf7cd1327da041e4adde86e"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/benmatselby/go-vsts"
+  packages = ["vsts"]
+  revision = "3f5425b588a2c43d278fb2ee56c3d704cda96482"
+
+[[projects]]
   name = "github.com/fatih/structs"
   packages = ["."]
   revision = "a720dfa8df582c51dee1b36feabb906bde1588bd"
@@ -102,6 +108,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "61e04be6728c9c6b19887e1c62f802cc733258c312d2b349fa3b8de88407ef89"
+  inputs-digest = "b19477002841c43120293b7d7db3f738d325bbb46eba5e2a807d857ff2238341"
   solver-name = "gps-cdcl"
   solver-version = 1
