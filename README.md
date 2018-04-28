@@ -38,6 +38,22 @@ Build:
     	The Visual Studio Team Services auth token (or define env var VSTS_TOKEN)
 ```
 
+# Installation via Docker
+
+```
+$ docker run \
+    --rm \
+    -t \
+    -eVSTS_ACCOUNT \
+    -eVSTS_PROJECT \
+    -eVSTS_TEAM \
+    -eVSTS_TOKEN \
+    -eTRAVIS_CI_TOKEN \
+    -eTRAVIS_CI_OWNER \
+    benmatselby/precis
+```
+
+
 # Installation via Git
 
 ```
