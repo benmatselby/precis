@@ -20,13 +20,19 @@ func doDate() *termui.Par {
 }
 
 func doIterationName() *termui.Par {
+	titleColour := termui.ColorCyan
+	if currentIteration == "" {
+		currentIteration = "?"
+		titleColour = termui.ColorRed
+	}
+
 	w := termui.NewPar(currentIteration)
 	w.Height = 3
 	w.PaddingLeft = 1
 	w.PaddingRight = 1
 	w.TextFgColor = termui.ColorWhite
 	w.BorderLabel = "Sprint"
-	w.BorderLabelFg = termui.ColorCyan
+	w.BorderLabelFg = titleColour
 	w.BorderFg = termui.ColorWhite
 
 	return w
