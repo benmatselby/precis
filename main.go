@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/benmatselby/precis/widget"
 	"github.com/gizak/termui"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -45,6 +45,8 @@ var (
 	vstsBuildCount int
 
 	interval string
+
+	debug bool
 )
 
 func init() {
@@ -58,6 +60,13 @@ func init() {
 	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
 
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
+
+	flag.BoolVar(&debug, "d", false, "Run in debug mode")
+
+	// Set the log level.
+	if debug {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 
 	flag.Usage = printUsage
 
@@ -75,61 +84,72 @@ func printUsage() {
 }
 
 func main() {
-	err := termui.Init()
+	var ticker *time.Ticker
+
+	// parse the duration
+	dur, err := time.ParseDuration(interval)
 	if err != nil {
-		panic(err)
+		logrus.Fatalf("parsing %s as duration failed: %v", interval, err)
+	}
+	ticker = time.NewTicker(dur)
+
+	// Initialize termui.
+	if err := termui.Init(); err != nil {
+		logrus.Fatalf("initializing termui failed: %v", err)
 	}
 	defer termui.Close()
 
-	duration, err := time.ParseDuration(interval)
-	if err != nil {
-		duration, _ = time.ParseDuration("60s")
-	}
-	ticker := time.NewTicker(duration)
+	// Create termui widgets for google analytics.
+	go dateWidget(nil)
+	go vstsWidget(nil)
+	go travisWidget(nil)
 
-	// Keyboard message
+	// Calculate the layout.
+	termui.Body.Align()
+	// Render the termui body.
+	termui.Render(termui.Body)
+
+	// Handle key q pressing
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
+		// press q to quit
 		ticker.Stop()
 		termui.StopLoop()
 	})
 
 	termui.Handle("/sys/kbd/C-c", func(termui.Event) {
+		// handle Ctrl + c combination
 		ticker.Stop()
 		termui.StopLoop()
 	})
 
 	// Handle resize
 	termui.Handle("/sys/wnd/resize", func(e termui.Event) {
-		exec()
+		termui.Body.Width = termui.TermWidth()
+		termui.Body.Align()
+		termui.Clear()
+		termui.Render(termui.Body)
 	})
 
+	// Update on an interval
 	go func() {
 		for range ticker.C {
-			exec()
+			body := termui.NewGrid()
+			body.X = 0
+			body.Y = 0
+			body.BgColor = termui.ThemeAttr("bg")
+			body.Width = termui.TermWidth()
+
+			dateWidget(body)
+			vstsWidget(body)
+			travisWidget(body)
+
+			// Calculate the layout.
+			body.Align()
+			// Render the termui body.
+			termui.Render(body)
 		}
 	}()
 
-	exec()
+	// Start the loop.
 	termui.Loop()
-}
-
-func exec() {
-	body := termui.NewGrid()
-	body.X = 0
-	body.Y = 0
-	body.BgColor = termui.ThemeAttr("bg")
-	body.Width = termui.TermWidth()
-
-	body.AddRows(
-		termui.NewRow(
-			termui.NewCol(12, 0, widget.Date()),
-		),
-		termui.NewRow(
-			termui.NewCol(5, 0, widget.Travis(travisToken, travisOwner)),
-			termui.NewCol(7, 0, widget.VstsBuilds(vstsToken, vstsAccount, vstsProject, vstsTeam, vstsBuildCount)),
-		),
-	)
-
-	body.Align()
-	termui.Render(body)
 }

@@ -1,19 +1,18 @@
-package widget
+package main
 
 import (
-	"log"
 	"time"
 
 	"github.com/benmatselby/go-vsts/vsts"
 	"github.com/gizak/termui"
+	"github.com/sirupsen/logrus"
 )
 
-// VstsBuilds will get build information from Visual Studio Team Services
-func VstsBuilds(token string, account string, project string, team string, count int) *termui.Table {
-	client := vsts.NewClient(account, project, token)
+func doVsts() (*termui.Table, error) {
+	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
 	builds, error := client.Builds.List()
 	if error != nil {
-		log.Fatal(error)
+		logrus.Fatal(error)
 	}
 
 	rows := [][]string{
@@ -22,7 +21,7 @@ func VstsBuilds(token string, account string, project string, team string, count
 	sadRows := []int{}
 	happyRows := []int{}
 
-	for index := 0; index < count; index++ {
+	for index := 0; index < vstsBuildCount; index++ {
 		build := builds[index]
 
 		finish, error := time.Parse(time.RFC3339, build.FinishTime)
@@ -46,7 +45,7 @@ func VstsBuilds(token string, account string, project string, team string, count
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.Block.BorderLabel = "VSTS CI builds - " + team
+	w.Block.BorderLabel = "VSTS CI builds - " + vstsTeam
 
 	w.Analysis()
 	w.SetSize()
@@ -59,5 +58,24 @@ func VstsBuilds(token string, account string, project string, team string, count
 		w.FgColors[line] = termui.ColorDefault
 	}
 
-	return w
+	return w, nil
+}
+
+func vstsWidget(body *termui.Grid) {
+	if body == nil {
+		body = termui.Body
+	}
+
+	travis, err := doVsts()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	if travis != nil {
+		body.AddRows(termui.NewRow(termui.NewCol(5, 0, travis)))
+
+		// Calculate the layout.
+		body.Align()
+		// Render the termui body.
+		termui.Render(body)
+	}
 }

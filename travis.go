@@ -1,19 +1,17 @@
-package widget
+package main
 
 import (
-	"log"
-
 	travis "github.com/Ableton/go-travis"
 	"github.com/gizak/termui"
+	"github.com/sirupsen/logrus"
 )
 
-// Travis will get the data from the Travis CI API
-func Travis(token string, owner string) *termui.Table {
-	client := travis.NewClient(travis.TRAVIS_API_DEFAULT_URL, token)
-	opt := &travis.RepositoryListOptions{OwnerName: owner, Active: true}
+func doTravis() (*termui.Table, error) {
+	client := travis.NewClient(travis.TRAVIS_API_DEFAULT_URL, travisToken)
+	opt := &travis.RepositoryListOptions{OwnerName: travisOwner, Active: true}
 	repos, _, err := client.Repositories.Find(opt)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	rows := [][]string{
@@ -21,6 +19,7 @@ func Travis(token string, owner string) *termui.Table {
 	}
 	sadRows := []int{}
 	happyRows := []int{}
+	buildRows := []int{}
 
 	for _, repo := range repos {
 		// Trying to remove the items that are not really running in Travis CI
@@ -31,13 +30,15 @@ func Travis(token string, owner string) *termui.Table {
 
 		branch, _, err := client.Branches.GetFromSlug(repo.Slug, "master")
 		if err != nil {
-			log.Fatal(err)
+			logrus.Fatal(err)
 		}
 
 		rows = append(rows, []string{repo.Slug, branch.State, branch.FinishedAt})
 
 		if branch.State == "failed" {
 			sadRows = append(sadRows, len(rows)-1)
+		} else if branch.State == "started" {
+			buildRows = append(buildRows, len(rows)-1)
 		} else {
 			happyRows = append(happyRows, len(rows)-1)
 		}
@@ -49,7 +50,7 @@ func Travis(token string, owner string) *termui.Table {
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.Block.BorderLabel = "Travis CI builds - " + owner
+	w.Block.BorderLabel = "Travis CI builds - " + travisOwner
 
 	w.Analysis()
 	w.SetSize()
@@ -58,9 +59,32 @@ func Travis(token string, owner string) *termui.Table {
 		w.FgColors[line] = termui.ColorRed
 	}
 
+	for _, line := range buildRows {
+		w.FgColors[line] = termui.ColorYellow
+	}
+
 	for _, line := range happyRows {
 		w.FgColors[line] = termui.ColorDefault
 	}
 
-	return w
+	return w, nil
+}
+
+func travisWidget(body *termui.Grid) {
+	if body == nil {
+		body = termui.Body
+	}
+
+	travis, err := doTravis()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	if travis != nil {
+		body.AddRows(termui.NewRow(termui.NewCol(5, 0, travis)))
+
+		// Calculate the layout.
+		body.Align()
+		// Render the termui body.
+		termui.Render(body)
+	}
 }
