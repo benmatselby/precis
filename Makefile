@@ -5,22 +5,31 @@ DOCKER_PREFIX = benmatselby
 explain:
 	### Welcome
 	#
-	# Makefile for precis
+	# .______   .______       _______   ______  __       _______.
+	# |   _  \  |   _  \     |   ____| /      ||  |     /       |
+	# |  |_)  | |  |_)  |    |  |__   |  ,----'|  |    |   (----
+	# |   ___/  |      /     |   __|  |  |     |  |     \   \
+	# |  |      |  |\  \----.|  |____ |   ----.|  | .----)   |
+	# | _|      | _|  ._____||_______| \______||__| |_______/
 	#
 	### Installation
 	#
 	# $$ make clean install
 	#
 
+GITCOMMIT := $(shell git rev-parse --short HEAD)
+
 .PHONY: clean
 clean:
-	rm -fr build;
 	rm -fr vendor
-	mkdir build;
 
 .PHONY: install
 install:
 	dep ensure
+
+.PHONY: vet
+vet:
+	go vet -v ./...
 
 .PHONY: build
 build:
@@ -28,18 +37,18 @@ build:
 
 .PHONY: static
 static:
-	go build -ldflags "-linkmode external -extldflags -static" -o $(NAME) .
+	CGO_ENABLED=0 go build -ldflags "-extldflags -static -X github.com/benmatselby/$(NAME)/version.GITCOMMIT=$(GITCOMMIT)" -o $(NAME) .
 
 .PHONY: test
 test:
-	go test ./... -coverprofile=build/profile.out
+	go test ./... -coverprofile=profile.out
 
 .PHONY: test-cov
 test-cov: test
-	go tool cover -html=build/profile.out
+	go tool cover -html=profile.out
 
 .PHONY: all
-all: clean install build test
+all: clean install vet build test
 
 .PHONY: docker-build
 docker-build:

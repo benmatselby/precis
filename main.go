@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/benmatselby/precis/version"
 	"github.com/gizak/termui"
 	"github.com/sirupsen/logrus"
 )
@@ -21,6 +22,8 @@ const (
 | _|      | _|  ._____||_______| \______||__| |_______/
 
 A terminal dashboard which gives an overview of useful things
+
+Build: %s
 
 You are going to need to define the following environment variables
 
@@ -79,7 +82,7 @@ func init() {
 }
 
 func printUsage() {
-	fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER))
+	fmt.Fprint(os.Stderr, fmt.Sprintf(BANNER, version.GITCOMMIT))
 	flag.PrintDefaults()
 }
 
