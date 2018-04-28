@@ -25,15 +25,6 @@ A terminal dashboard which gives an overview of useful things
 
 Build: %s
 
-You are going to need to define the following environment variables
-
-* TRAVIS_CI_TOKEN
-* TRAVIS_CI_OWNER
-* VSTS_ACCOUNT
-* VSTS_PROJECT
-* VSTS_TEAM
-* VSTS_TOKEN
-
 `
 )
 
@@ -53,13 +44,13 @@ var (
 )
 
 func init() {
-	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token")
-	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner")
+	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)")
+	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner (or define env var TRAVIS_CI_OWNER)")
 
-	flag.StringVar(&vstsAccount, "vsts-account", os.Getenv("VSTS_ACCOUNT"), "The Visual Studio Team Services account")
-	flag.StringVar(&vstsProject, "vsts-project", os.Getenv("VSTS_PROJECT"), "The Visual Studio Team Services project")
-	flag.StringVar(&vstsTeam, "vsts-team", os.Getenv("VSTS_TEAM"), "The Visual Studio Team Services team")
-	flag.StringVar(&vstsToken, "vsts-token", os.Getenv("VSTS_TOKEN"), "The Visual Studio Team Services auth token")
+	flag.StringVar(&vstsAccount, "vsts-account", os.Getenv("VSTS_ACCOUNT"), "The Visual Studio Team Services account (or define env var VSTS_ACCOUNT)")
+	flag.StringVar(&vstsProject, "vsts-project", os.Getenv("VSTS_PROJECT"), "The Visual Studio Team Services project (or define env var VSTS_PROJECT)")
+	flag.StringVar(&vstsTeam, "vsts-team", os.Getenv("VSTS_TEAM"), "The Visual Studio Team Services team (or define env var VSTS_TEAM)")
+	flag.StringVar(&vstsToken, "vsts-token", os.Getenv("VSTS_TOKEN"), "The Visual Studio Team Services auth token (or define env var VSTS_TOKEN)")
 	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
 
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
