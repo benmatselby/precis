@@ -38,7 +38,8 @@ var (
 	vstsToken      string
 	vstsBuildCount int
 
-	interval string
+	currentIteration string
+	interval         string
 
 	debug bool
 )
@@ -53,6 +54,7 @@ func init() {
 	flag.StringVar(&vstsToken, "vsts-token", os.Getenv("VSTS_TOKEN"), "The Visual Studio Team Services auth token (or define env var VSTS_TOKEN)")
 	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
 
+	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.BoolVar(&debug, "d", false, "Run in debug mode")
@@ -94,7 +96,7 @@ func main() {
 	defer termui.Close()
 
 	// Create termui widgets for google analytics.
-	go dateWidget(nil)
+	go titleWidget(nil)
 	go vstsWidget(nil)
 	go travisWidget(nil)
 
@@ -133,7 +135,7 @@ func main() {
 			body.BgColor = termui.ThemeAttr("bg")
 			body.Width = termui.TermWidth()
 
-			dateWidget(body)
+			titleWidget(body)
 			vstsWidget(body)
 			travisWidget(body)
 
