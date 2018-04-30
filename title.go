@@ -41,6 +41,9 @@ func doIterationName() *termui.Par {
 func titleWidget(body *termui.Grid) {
 	if body == nil {
 		body = termui.Body
+		// It seems that if we don't pause on the first iteration
+		// of this widget, we get a crash in docker.
+		time.Sleep(1 * time.Second)
 	}
 
 	body.AddRows(
