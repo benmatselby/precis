@@ -105,6 +105,10 @@ func getVstsPulls() (*termui.Table, error) {
 }
 
 func vstsWidget(body *termui.Grid) {
+	if displayVsts == false {
+		return
+	}
+
 	if body == nil {
 		body = termui.Body
 	}

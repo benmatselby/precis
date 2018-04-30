@@ -41,6 +41,9 @@ var (
 	currentIteration string
 	interval         string
 
+	displayTravis bool
+	displayVsts   bool
+
 	debug bool
 )
 
@@ -56,6 +59,9 @@ func init() {
 
 	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
+
+	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
+	flag.BoolVar(&displayVsts, "display-vsts", true, "Do you want to show Visual Studio Team Services information?")
 
 	flag.BoolVar(&debug, "d", false, "Run in debug mode")
 

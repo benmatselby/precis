@@ -71,6 +71,10 @@ func doTravis() (*termui.Table, error) {
 }
 
 func travisWidget(body *termui.Grid) {
+	if displayTravis == false {
+		return
+	}
+
 	if body == nil {
 		body = termui.Body
 	}
