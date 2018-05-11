@@ -166,7 +166,7 @@ func vstsWidget(body *termui.Grid) {
 	if builds != nil {
 		body.AddRows(
 			termui.NewRow(
-				termui.NewCol(5, 0, builds),
+				termui.NewCol(12, 0, builds),
 			),
 		)
 	}
