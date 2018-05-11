@@ -50,6 +50,7 @@ func doTravis() (*termui.Table, error) {
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
+	w.BorderLabelFg = termui.ColorCyan
 	w.Block.BorderLabel = "Travis CI builds - " + travisOwner
 
 	w.Analysis()

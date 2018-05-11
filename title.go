@@ -48,7 +48,7 @@ func titleWidget(body *termui.Grid) {
 
 	body.AddRows(
 		termui.NewRow(
-			termui.NewCol(4, 0, doDate()),
+			termui.NewCol(11, 0, doDate()),
 			termui.NewCol(1, 0, doIterationName()),
 		),
 	)
