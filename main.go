@@ -32,11 +32,12 @@ var (
 	travisToken string
 	travisOwner string
 
-	vstsAccount    string
-	vstsProject    string
-	vstsTeam       string
-	vstsToken      string
-	vstsBuildCount int
+	vstsAccount           string
+	vstsProject           string
+	vstsTeam              string
+	vstsToken             string
+	vstsBuildBranchFilter string
+	vstsBuildCount        int
 
 	currentIteration string
 	interval         string
@@ -56,6 +57,7 @@ func init() {
 	flag.StringVar(&vstsTeam, "vsts-team", os.Getenv("VSTS_TEAM"), "The Visual Studio Team Services team (or define env var VSTS_TEAM)")
 	flag.StringVar(&vstsToken, "vsts-token", os.Getenv("VSTS_TOKEN"), "The Visual Studio Team Services auth token (or define env var VSTS_TOKEN)")
 	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
+	flag.StringVar(&vstsBuildBranchFilter, "vsts-build-branch", "master", "Comma separated list of branches to display")
 
 	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/benmatselby/go-vsts/vsts"
@@ -9,18 +11,44 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func getVstsBuildsForBranch(defID int, branchName string) ([]vsts.Build, error) {
+	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
+	buildOpts := vsts.BuildsListOptions{Definitions: strconv.Itoa(defID), Branch: "refs/heads/" + branchName, Count: 1}
+	build, error := client.Builds.List(&buildOpts)
+	return build, error
+}
+
 func getVstsBuilds() (*termui.Table, error) {
 	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
-	builds, error := client.Builds.List()
+
+	buildDefOpts := vsts.BuildDefinitionsListOptions{Path: "\\" + vstsTeam}
+	definitions, error := client.BuildDefinitions.List(&buildDefOpts)
 	if error != nil {
 		logrus.Fatal(error)
+	}
+
+	var builds []vsts.Build
+	for _, definition := range definitions {
+		for _, branchName := range strings.Split(vstsBuildBranchFilter, ",") {
+			build, error := getVstsBuildsForBranch(definition.ID, branchName)
+			if error != nil {
+				continue
+			}
+			if len(build) > 0 {
+				builds = append(builds, build[0])
+			}
+		}
 	}
 
 	rows := [][]string{
 		{"repo", "state", "branch", "finished"},
 	}
 	sadRows := []int{}
-	happyRows := []int{}
+	buildingRows := []int{}
+
+	if len(builds) < vstsBuildCount {
+		vstsBuildCount = len(builds)
+	}
 
 	for index := 0; index < vstsBuildCount; index++ {
 		build := builds[index]
@@ -35,8 +63,10 @@ func getVstsBuilds() (*termui.Table, error) {
 
 		if build.Result == "failed" {
 			sadRows = append(sadRows, len(rows)-1)
-		} else {
-			happyRows = append(happyRows, len(rows)-1)
+		}
+
+		if build.Status == "inProgress" {
+			buildingRows = append(buildingRows, len(rows)-1)
 		}
 	}
 
@@ -55,8 +85,8 @@ func getVstsBuilds() (*termui.Table, error) {
 		w.FgColors[line] = termui.ColorRed
 	}
 
-	for _, line := range happyRows {
-		w.FgColors[line] = termui.ColorDefault
+	for _, line := range buildingRows {
+		w.FgColors[line] = termui.ColorYellow
 	}
 
 	return w, nil
@@ -123,17 +153,24 @@ func vstsWidget(body *termui.Grid) {
 		logrus.Fatal(err)
 	}
 
+	if len(pulls.Rows) > 0 {
+		body.AddRows(
+			termui.NewRow(
+				termui.NewCol(12, 0, pulls),
+			),
+		)
+	}
+
 	if builds != nil {
 		body.AddRows(
 			termui.NewRow(
 				termui.NewCol(5, 0, builds),
-				termui.NewCol(7, 0, pulls),
 			),
 		)
-
-		// Calculate the layout.
-		body.Align()
-		// Render the termui body.
-		termui.Render(body)
 	}
+
+	// Calculate the layout.
+	body.Align()
+	// Render the termui body.
+	termui.Render(body)
 }
