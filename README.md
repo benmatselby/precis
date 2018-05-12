@@ -19,7 +19,13 @@ A terminal dashboard which gives an overview of useful things
 
 Build:
 
+  -current-iteration string
+    	What is the current iteration
   -d	Run in debug mode
+  -display-travis
+    	Do you want to show Travis CI information? (default true)
+  -display-vsts
+    	Do you want to show Visual Studio Team Services information? (default true)
   -interval string
     	The refresh rate for the dashboard (default "60s")
   -travis-owner string
@@ -28,6 +34,8 @@ Build:
     	The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)
   -vsts-account string
     	The Visual Studio Team Services account (or define env var VSTS_ACCOUNT)
+  -vsts-build-branch string
+    	Comma separated list of branches to display (default "master")
   -vsts-build-count int
     	How many builds should we display (default 10)
   -vsts-project string
