@@ -8,30 +8,29 @@ import (
 
 	"github.com/benmatselby/go-vsts/vsts"
 	"github.com/gizak/termui"
-	"github.com/sirupsen/logrus"
 )
 
 func getVstsBuildsForBranch(defID int, branchName string) ([]vsts.Build, error) {
 	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
 	buildOpts := vsts.BuildsListOptions{Definitions: strconv.Itoa(defID), Branch: "refs/heads/" + branchName, Count: 1}
-	build, error := client.Builds.List(&buildOpts)
-	return build, error
+	build, err := client.Builds.List(&buildOpts)
+	return build, err
 }
 
 func getVstsBuilds() (*termui.Table, error) {
 	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
 
 	buildDefOpts := vsts.BuildDefinitionsListOptions{Path: "\\" + vstsTeam}
-	definitions, error := client.BuildDefinitions.List(&buildDefOpts)
-	if error != nil {
-		logrus.Fatal(error)
+	definitions, err := client.BuildDefinitions.List(&buildDefOpts)
+	if err != nil {
+		return nil, err
 	}
 
 	var builds []vsts.Build
 	for _, definition := range definitions {
 		for _, branchName := range strings.Split(vstsBuildBranchFilter, ",") {
-			build, error := getVstsBuildsForBranch(definition.ID, branchName)
-			if error != nil {
+			build, err := getVstsBuildsForBranch(definition.ID, branchName)
+			if err != nil {
 				continue
 			}
 			if len(build) > 0 {
@@ -77,7 +76,7 @@ func getVstsBuilds() (*termui.Table, error) {
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
 	w.BorderLabelFg = termui.ColorCyan
-	w.Block.BorderLabel = "VSTS CI builds - " + vstsTeam
+	w.Block.BorderLabel = "VSTS CI Builds - " + vstsTeam
 
 	w.Analysis()
 	w.SetSize()
@@ -96,9 +95,9 @@ func getVstsBuilds() (*termui.Table, error) {
 func getVstsPulls() (*termui.Table, error) {
 	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
 	opts := vsts.PullRequestListOptions{State: "active"}
-	pulls, count, error := client.PullRequests.List(&opts)
-	if error != nil {
-		logrus.Fatal(error)
+	pulls, count, err := client.PullRequests.List(&opts)
+	if err != nil {
+		return nil, err
 	}
 
 	rows := [][]string{
@@ -147,12 +146,12 @@ func vstsWidget(body *termui.Grid) {
 
 	builds, err := getVstsBuilds()
 	if err != nil {
-		logrus.Fatal(err)
+		builds = getFailureDisplay("VSTS CI Builds")
 	}
 
 	pulls, err := getVstsPulls()
 	if err != nil {
-		logrus.Fatal(err)
+		pulls = getFailureDisplay("VSTS Pull Requests")
 	}
 
 	if len(pulls.Rows) > 0 {
