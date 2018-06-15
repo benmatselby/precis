@@ -8,7 +8,6 @@ import (
 
 	"github.com/benmatselby/precis/version"
 	"github.com/gizak/termui"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -65,15 +64,7 @@ func init() {
 	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
 	flag.BoolVar(&displayVsts, "display-vsts", true, "Do you want to show Visual Studio Team Services information?")
 
-	flag.BoolVar(&debug, "d", false, "Run in debug mode")
-
-	// Set the log level.
-	if debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	}
-
 	flag.Usage = printUsage
-
 	flag.Parse()
 
 	if travisToken == "" || travisOwner == "" || vstsAccount == "" || vstsProject == "" || vstsTeam == "" || vstsToken == "" {
@@ -93,13 +84,15 @@ func main() {
 	// parse the duration
 	dur, err := time.ParseDuration(interval)
 	if err != nil {
-		logrus.Fatalf("parsing %s as duration failed: %v", interval, err)
+		fmt.Fprintf(os.Stderr, "parsing %s as duration failed: %v", interval, err)
+		os.Exit(2)
 	}
 	ticker = time.NewTicker(dur)
 
 	// Initialize termui.
 	if err := termui.Init(); err != nil {
-		logrus.Fatalf("initializing termui failed: %v", err)
+		fmt.Fprintf(os.Stderr, "initializing termui failed: %v", err)
+		os.Exit(2)
 	}
 	defer termui.Close()
 
