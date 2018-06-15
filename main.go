@@ -157,3 +157,21 @@ func main() {
 	// Start the loop.
 	termui.Loop()
 }
+
+func getFailureDisplay(target string) *termui.Table {
+	w := termui.NewTable()
+	w.Rows = [][]string{
+		{"Failure"},
+	}
+	w.FgColor = termui.ColorWhite
+	w.BgColor = termui.ColorDefault
+	w.TextAlign = termui.AlignLeft
+	w.Border = true
+	w.BorderLabelFg = termui.ColorRed
+	w.Block.BorderLabel = "Failed to get data for " + target
+
+	w.Analysis()
+	w.SetSize()
+
+	return w
+}

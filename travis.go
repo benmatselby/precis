@@ -3,7 +3,6 @@ package main
 import (
 	travis "github.com/Ableton/go-travis"
 	"github.com/gizak/termui"
-	"github.com/sirupsen/logrus"
 )
 
 func doTravis() (*termui.Table, error) {
@@ -11,7 +10,7 @@ func doTravis() (*termui.Table, error) {
 	opt := &travis.RepositoryListOptions{OwnerName: travisOwner, Active: true}
 	repos, _, err := client.Repositories.Find(opt)
 	if err != nil {
-		logrus.Fatal(err)
+		return nil, err
 	}
 
 	rows := [][]string{
@@ -30,7 +29,7 @@ func doTravis() (*termui.Table, error) {
 
 		branch, _, err := client.Branches.GetFromSlug(repo.Slug, "master")
 		if err != nil {
-			logrus.Fatal(err)
+			return nil, err
 		}
 
 		rows = append(rows, []string{repo.Slug, branch.State, branch.FinishedAt})
@@ -51,7 +50,7 @@ func doTravis() (*termui.Table, error) {
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
 	w.BorderLabelFg = termui.ColorCyan
-	w.Block.BorderLabel = "Travis CI builds - " + travisOwner
+	w.Block.BorderLabel = "Travis CI Builds - " + travisOwner
 
 	w.Analysis()
 	w.SetSize()
@@ -82,10 +81,10 @@ func travisWidget(body *termui.Grid) {
 
 	travis, err := doTravis()
 	if err != nil {
-		logrus.Fatal(err)
+		travis = getFailureDisplay("Travis CI Builds")
 	}
 	if travis != nil {
-		body.AddRows(termui.NewRow(termui.NewCol(5, 0, travis)))
+		body.AddRows(termui.NewRow(termui.NewCol(12, 0, travis)))
 
 		// Calculate the layout.
 		body.Align()
