@@ -75,7 +75,7 @@ func getVstsBuilds() (*termui.Table, error) {
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.BorderLabelFg = termui.ColorCyan
+	w.BorderLabelFg = termui.ColorGreen
 	w.Block.BorderLabel = "VSTS CI Builds - " + vstsTeam
 
 	w.Analysis()
@@ -126,7 +126,7 @@ func getVstsPulls() (*termui.Table, error) {
 	w.BgColor = termui.ColorDefault
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.BorderLabelFg = termui.ColorCyan
+	w.BorderLabelFg = termui.ColorGreen
 	w.Block.BorderLabel = "VSTS Pull Requests - " + vstsTeam
 
 	w.Analysis()

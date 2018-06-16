@@ -14,14 +14,14 @@ func doDate() *termui.Par {
 	w.PaddingRight = 1
 	w.TextFgColor = termui.ColorWhite
 	w.BorderLabel = "Today"
-	w.BorderLabelFg = termui.ColorCyan
+	w.BorderLabelFg = termui.ColorGreen
 	w.BorderFg = termui.ColorWhite
 
 	return w
 }
 
 func doIterationName() *termui.Par {
-	titleColour := termui.ColorCyan
+	titleColour := termui.ColorGreen
 	if currentIteration == "" {
 		currentIteration = "?"
 		titleColour = termui.ColorRed
