@@ -7,7 +7,8 @@ import (
 )
 
 func doDate() *termui.Par {
-	w := termui.NewPar(time.Now().Format("Monday, 2 January 2006 @ 15:04:05"))
+
+	w := termui.NewPar(time.Now().Local().Format("Monday, 2 January 2006 @ 15:04:05"))
 	w.Height = 3
 	w.PaddingLeft = 1
 	w.PaddingRight = 1
