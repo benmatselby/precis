@@ -1,6 +1,9 @@
 package main
 
 import (
+	"sort"
+	"time"
+
 	travis "github.com/Ableton/go-travis"
 	"github.com/gizak/termui"
 )
@@ -12,6 +15,8 @@ func doTravis() (*termui.Table, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	sort.Slice(repos, func(i, j int) bool { return repos[i].LastBuildFinishedAt > repos[j].LastBuildFinishedAt })
 
 	rows := [][]string{
 		{"repo", "state", "finished"},
@@ -32,7 +37,13 @@ func doTravis() (*termui.Table, error) {
 			return nil, err
 		}
 
-		rows = append(rows, []string{repo.Slug, branch.State, branch.FinishedAt})
+		finish, error := time.Parse(time.RFC3339, branch.FinishedAt)
+		finishAt := finish.Format("2006-01-02 15:04:05")
+		if error != nil {
+			finishAt = branch.FinishedAt
+		}
+
+		rows = append(rows, []string{repo.Slug, branch.State, finishAt})
 
 		if branch.State == "failed" {
 			sadRows = append(sadRows, len(rows)-1)
