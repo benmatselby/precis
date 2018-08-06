@@ -69,7 +69,7 @@ func init() {
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
-	flag.BoolVar(&displayVsts, "display-vsts", true, "Do you want to show Visual Studio Team Services information?")
+	flag.BoolVar(&displayVsts, "display-vsts", false, "Do you want to show Visual Studio Team Services information?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
 
 	flag.Usage = printUsage
