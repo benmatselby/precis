@@ -38,11 +38,15 @@ var (
 	vstsBuildBranchFilter string
 	vstsBuildCount        int
 
+	githubOwner string
+	githubToken string
+
 	currentIteration string
 	interval         string
 
 	displayTravis bool
 	displayVsts   bool
+	displayGitHub bool
 
 	debug bool
 )
@@ -58,16 +62,30 @@ func init() {
 	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
 	flag.StringVar(&vstsBuildBranchFilter, "vsts-build-branch", "master", "Comma separated list of branches to display")
 
+	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub CI authentication token (or define env var GITHUB_TOKEN)")
+	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub CI owner (or define env var GITHUB_OWNER)")
+
 	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
-	flag.BoolVar(&displayVsts, "display-vsts", true, "Do you want to show Visual Studio Team Services information?")
+	flag.BoolVar(&displayVsts, "display-vsts", false, "Do you want to show Visual Studio Team Services information?")
+	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
 
 	flag.Usage = printUsage
 	flag.Parse()
 
-	if travisToken == "" || travisOwner == "" || vstsAccount == "" || vstsProject == "" || vstsTeam == "" || vstsToken == "" {
+	if displayTravis && (travisToken == "" || travisOwner == "") {
+		printUsage()
+		os.Exit(1)
+	}
+
+	if displayVsts && (vstsAccount == "" || vstsProject == "" || vstsTeam == "" || vstsToken == "") {
+		printUsage()
+		os.Exit(1)
+	}
+
+	if displayGitHub && (githubOwner == "" || githubToken == "") {
 		printUsage()
 		os.Exit(1)
 	}
@@ -100,6 +118,7 @@ func main() {
 	go titleWidget(nil)
 	go vstsWidget(nil)
 	go travisWidget(nil)
+	go githubWidget(nil)
 
 	// Calculate the layout.
 	termui.Body.Align()
@@ -139,6 +158,7 @@ func main() {
 			titleWidget(body)
 			vstsWidget(body)
 			travisWidget(body)
+			githubWidget(body)
 
 			// Calculate the layout.
 			body.Align()
