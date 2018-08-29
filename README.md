@@ -1,11 +1,10 @@
-Precis
-======
+# Precis
 
 [![Build Status](https://travis-ci.org/benmatselby/precis.png?branch=master)](https://travis-ci.org/benmatselby/precis)
 
 CLI application for getting information out of various systems in a neat dashboard format. This is inspired from [@jessfraz/tdash](https://github.com/jessfraz/tdash)'s dashboard
 
-# Usage
+## Usage
 
 ```
 .______   .______       _______   ______  __       _______.
@@ -21,11 +20,16 @@ Build:
 
   -current-iteration string
     	What is the current iteration
-  -d	Run in debug mode
+  -display-github
+    	Do you want to show GitHub information? (default true)
   -display-travis
     	Do you want to show Travis CI information? (default true)
   -display-vsts
-    	Do you want to show Visual Studio Team Services information? (default true)
+    	Do you want to show Visual Studio Team Services information?
+  -github-owner string
+    	The GitHub CI owner (or define env var GITHUB_OWNER)
+  -github-token string
+    	The GitHub CI authentication token (or define env var GITHUB_TOKEN)
   -interval string
     	The refresh rate for the dashboard (default "60s")
   -travis-owner string
@@ -46,7 +50,24 @@ Build:
     	The Visual Studio Team Services auth token (or define env var VSTS_TOKEN)
 ```
 
-# Installation via Docker
+## Configuration
+
+You will need the following environment variables defining, depending on which systems you are running in the dashboard:
+
+```
+$ export VSTS_ACCOUNT=""
+$ export VSTS_PROJECT=""
+$ export VSTS_TEAM=""
+$ export VSTS_TOKEN=""
+$ export TRAVIS_CI_TOKEN=""
+$ export TRAVIS_CI_OWNER=""
+$ export GITHUB_TOKEN=""
+$ export GITHUB_OWNER=""
+```
+
+## Installation via Docker
+
+Other than requiring [docker](http://docker.com) to be installed, there are no other requirements to run the application this way. This is the preferred method of running the `precis`. The image is [here](https://hub.docker.com/r/benmatselby/precis/).
 
 ```
 $ docker run \
@@ -58,11 +79,12 @@ $ docker run \
     -eVSTS_TOKEN \
     -eTRAVIS_CI_TOKEN \
     -eTRAVIS_CI_OWNER \
+    -eGITHUB_TOKEN \
+    -eGITHUB_OWNER \
     benmatselby/precis
 ```
 
-
-# Installation via Git
+## Installation via Git
 
 ```
 $ git clone git@github.com:benmatselby/precis.git
