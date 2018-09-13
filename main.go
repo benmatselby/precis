@@ -114,11 +114,10 @@ func main() {
 	}
 	defer termui.Close()
 
-	// Create termui widgets for google analytics.
 	go titleWidget(nil)
+	go githubWidget(nil)
 	go azureDevOpsWidget(nil)
 	go travisWidget(nil)
-	go githubWidget(nil)
 
 	// Calculate the layout.
 	termui.Body.Align()
@@ -156,9 +155,9 @@ func main() {
 			body.Width = termui.TermWidth()
 
 			titleWidget(body)
+			githubWidget(body)
 			azureDevOpsWidget(body)
 			travisWidget(body)
-			githubWidget(body)
 
 			// Calculate the layout.
 			body.Align()
