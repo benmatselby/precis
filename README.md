@@ -4,6 +4,12 @@
 
 CLI application for getting information out of various systems in a neat dashboard format. This is inspired from [@jessfraz/tdash](https://github.com/jessfraz/tdash)'s dashboard
 
+It integrates with:
+
+- GitHub
+- Azure DevOps
+- TravisCI
+
 ## Usage
 
 ```
