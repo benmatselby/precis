@@ -31,12 +31,12 @@ var (
 	travisToken string
 	travisOwner string
 
-	vstsAccount           string
-	vstsProject           string
-	vstsTeam              string
-	vstsToken             string
-	vstsBuildBranchFilter string
-	vstsBuildCount        int
+	azureDevOpsAccount           string
+	azureDevOpsProject           string
+	azureDevOpsTeam              string
+	azureDevOpsToken             string
+	azureDevOpsBuildBranchFilter string
+	azureDevOpsBuildCount        int
 
 	githubOwner string
 	githubToken string
@@ -44,9 +44,9 @@ var (
 	currentIteration string
 	interval         string
 
-	displayTravis bool
-	displayVsts   bool
-	displayGitHub bool
+	displayTravis      bool
+	displayAzureDevOps bool
+	displayGitHub      bool
 
 	debug bool
 )
@@ -55,12 +55,12 @@ func init() {
 	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)")
 	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner (or define env var TRAVIS_CI_OWNER)")
 
-	flag.StringVar(&vstsAccount, "vsts-account", os.Getenv("VSTS_ACCOUNT"), "The Visual Studio Team Services account (or define env var VSTS_ACCOUNT)")
-	flag.StringVar(&vstsProject, "vsts-project", os.Getenv("VSTS_PROJECT"), "The Visual Studio Team Services project (or define env var VSTS_PROJECT)")
-	flag.StringVar(&vstsTeam, "vsts-team", os.Getenv("VSTS_TEAM"), "The Visual Studio Team Services team (or define env var VSTS_TEAM)")
-	flag.StringVar(&vstsToken, "vsts-token", os.Getenv("VSTS_TOKEN"), "The Visual Studio Team Services auth token (or define env var VSTS_TOKEN)")
-	flag.IntVar(&vstsBuildCount, "vsts-build-count", 10, "How many builds should we display")
-	flag.StringVar(&vstsBuildBranchFilter, "vsts-build-branch", "master", "Comma separated list of branches to display")
+	flag.StringVar(&azureDevOpsAccount, "azure-devops-account", os.Getenv("AZURE_DEVOPS_ACCOUNT"), "The Visual Studio Team Services account (or define env var AZURE_DEVOPS_ACCOUNT)")
+	flag.StringVar(&azureDevOpsProject, "azure-devops-project", os.Getenv("AZURE_DEVOPS_PROJECT"), "The Visual Studio Team Services project (or define env var AZURE_DEVOPS_PROJECT)")
+	flag.StringVar(&azureDevOpsTeam, "azure-devops-team", os.Getenv("AZURE_DEVOPS_TEAM"), "The Visual Studio Team Services team (or define env var AZURE_DEVOPS_TEAM)")
+	flag.StringVar(&azureDevOpsToken, "azure-devops-token", os.Getenv("AZURE_DEVOPS_TOKEN"), "The Visual Studio Team Services auth token (or define env var AZURE_DEVOPS_TOKEN)")
+	flag.IntVar(&azureDevOpsBuildCount, "azure-devops-build-count", 10, "How many builds should we display")
+	flag.StringVar(&azureDevOpsBuildBranchFilter, "azure-devops-build-branch", "master", "Comma separated list of branches to display")
 
 	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub CI authentication token (or define env var GITHUB_TOKEN)")
 	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub CI owner (or define env var GITHUB_OWNER)")
@@ -69,7 +69,7 @@ func init() {
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
-	flag.BoolVar(&displayVsts, "display-vsts", false, "Do you want to show Visual Studio Team Services information?")
+	flag.BoolVar(&displayAzureDevOps, "display-azure-devops", false, "Do you want to show Azure DevOps information?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
 
 	flag.Usage = printUsage
@@ -80,7 +80,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	if displayVsts && (vstsAccount == "" || vstsProject == "" || vstsTeam == "" || vstsToken == "") {
+	if displayAzureDevOps && (azureDevOpsAccount == "" || azureDevOpsProject == "" || azureDevOpsTeam == "" || azureDevOpsToken == "") {
 		printUsage()
 		os.Exit(1)
 	}
@@ -116,7 +116,7 @@ func main() {
 
 	// Create termui widgets for google analytics.
 	go titleWidget(nil)
-	go vstsWidget(nil)
+	go azureDevOpsWidget(nil)
 	go travisWidget(nil)
 	go githubWidget(nil)
 
@@ -156,7 +156,7 @@ func main() {
 			body.Width = termui.TermWidth()
 
 			titleWidget(body)
-			vstsWidget(body)
+			azureDevOpsWidget(body)
 			travisWidget(body)
 			githubWidget(body)
 

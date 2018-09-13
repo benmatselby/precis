@@ -6,30 +6,30 @@ import (
 	"strings"
 	"time"
 
-	"github.com/benmatselby/go-vsts/vsts"
+	"github.com/benmatselby/go-azuredevops/azuredevops"
 	"github.com/gizak/termui"
 )
 
-func getVstsBuildsForBranch(defID int, branchName string) ([]vsts.Build, error) {
-	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
-	buildOpts := vsts.BuildsListOptions{Definitions: strconv.Itoa(defID), Branch: "refs/heads/" + branchName, Count: 1}
+func getAzureDevOpsBuildsForBranch(defID int, branchName string) ([]azuredevops.Build, error) {
+	client := azuredevops.NewClient(azureDevOpsAccount, azureDevOpsProject, azureDevOpsToken)
+	buildOpts := azuredevops.BuildsListOptions{Definitions: strconv.Itoa(defID), Branch: "refs/heads/" + branchName, Count: 1}
 	build, err := client.Builds.List(&buildOpts)
 	return build, err
 }
 
-func getVstsBuilds() (*termui.Table, error) {
-	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
+func getAzureDevOpsBuilds() (*termui.Table, error) {
+	client := azuredevops.NewClient(azureDevOpsAccount, azureDevOpsProject, azureDevOpsToken)
 
-	buildDefOpts := vsts.BuildDefinitionsListOptions{Path: "\\" + vstsTeam}
+	buildDefOpts := azuredevops.BuildDefinitionsListOptions{Path: "\\" + azureDevOpsTeam}
 	definitions, err := client.BuildDefinitions.List(&buildDefOpts)
 	if err != nil {
 		return nil, err
 	}
 
-	var builds []vsts.Build
+	var builds []azuredevops.Build
 	for _, definition := range definitions {
-		for _, branchName := range strings.Split(vstsBuildBranchFilter, ",") {
-			build, err := getVstsBuildsForBranch(definition.ID, branchName)
+		for _, branchName := range strings.Split(azureDevOpsBuildBranchFilter, ",") {
+			build, err := getAzureDevOpsBuildsForBranch(definition.ID, branchName)
 			if err != nil {
 				continue
 			}
@@ -45,11 +45,11 @@ func getVstsBuilds() (*termui.Table, error) {
 	sadRows := []int{}
 	buildingRows := []int{}
 
-	if len(builds) < vstsBuildCount {
-		vstsBuildCount = len(builds)
+	if len(builds) < azureDevOpsBuildCount {
+		azureDevOpsBuildCount = len(builds)
 	}
 
-	for index := 0; index < vstsBuildCount; index++ {
+	for index := 0; index < azureDevOpsBuildCount; index++ {
 		build := builds[index]
 
 		finish, error := time.Parse(time.RFC3339, build.FinishTime)
@@ -76,7 +76,7 @@ func getVstsBuilds() (*termui.Table, error) {
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
 	w.BorderLabelFg = termui.ColorGreen
-	w.Block.BorderLabel = "VSTS CI Builds - " + vstsTeam
+	w.Block.BorderLabel = "Azure DevOps CI Builds - " + azureDevOpsTeam
 
 	w.Analysis()
 	w.SetSize()
@@ -92,9 +92,9 @@ func getVstsBuilds() (*termui.Table, error) {
 	return w, nil
 }
 
-func getVstsPulls() (*termui.Table, error) {
-	client := vsts.NewClient(vstsAccount, vstsProject, vstsToken)
-	opts := vsts.PullRequestListOptions{State: "active"}
+func getAzureDevOpsPulls() (*termui.Table, error) {
+	client := azuredevops.NewClient(azureDevOpsAccount, azureDevOpsProject, azureDevOpsToken)
+	opts := azuredevops.PullRequestListOptions{State: "active"}
 	pulls, count, err := client.PullRequests.List(&opts)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func getVstsPulls() (*termui.Table, error) {
 	w.TextAlign = termui.AlignLeft
 	w.Border = true
 	w.BorderLabelFg = termui.ColorGreen
-	w.Block.BorderLabel = "VSTS Pull Requests - " + vstsTeam
+	w.Block.BorderLabel = "Azure DevOps Pull Requests - " + azureDevOpsTeam
 
 	w.Analysis()
 	w.SetSize()
@@ -135,8 +135,8 @@ func getVstsPulls() (*termui.Table, error) {
 	return w, nil
 }
 
-func vstsWidget(body *termui.Grid) {
-	if displayVsts == false {
+func azureDevOpsWidget(body *termui.Grid) {
+	if displayAzureDevOps == false {
 		return
 	}
 
@@ -144,14 +144,14 @@ func vstsWidget(body *termui.Grid) {
 		body = termui.Body
 	}
 
-	builds, err := getVstsBuilds()
+	builds, err := getAzureDevOpsBuilds()
 	if err != nil {
-		builds = getFailureDisplay("VSTS CI Builds")
+		builds = getFailureDisplay("Azure DevOps CI Builds")
 	}
 
-	pulls, err := getVstsPulls()
+	pulls, err := getAzureDevOpsPulls()
 	if err != nil {
-		pulls = getFailureDisplay("VSTS Pull Requests")
+		pulls = getFailureDisplay("Azure DevOps Pull Requests")
 	}
 
 	if len(pulls.Rows) > 0 {
