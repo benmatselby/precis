@@ -11,11 +11,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:4f23556459b0306fdf3f408e82c551ef05eb72ffc0f32b5b8a609bd7d9e4c323"
-  name = "github.com/benmatselby/go-vsts"
-  packages = ["vsts"]
+  digest = "1:32a4531383fc6b1e897ec5f1afecbcf089a71a5bce9c45c660e31e33e20dc8eb"
+  name = "github.com/benmatselby/go-azuredevops"
+  packages = ["azuredevops"]
   pruneopts = "UT"
-  revision = "68d296d5d564279b3640c8ffb93d51d4dac4c380"
+  revision = "7381aa93bebc601ae80b59ecb1881e1542bf2022"
 
 [[projects]]
   digest = "1:ca82a3b99694824c627573c2a76d0e49719b4a9c02d1d85a2ac91f1c1f52ab9b"
@@ -26,12 +26,12 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:48693168f253ef4b2a8d076f0a4ef300237b80494d05bec05491fa8cc67eb0df"
+  digest = "1:0b98586be892040d424cdd4fb7e047f71ddfcdbfca59f975a4b4eb14b56ae33c"
   name = "github.com/gizak/termui"
   packages = ["."]
   pruneopts = "UT"
-  revision = "24acd523c756fd9728824cdfac66aad9d8982fb7"
-  version = "v2.2.0"
+  revision = "bf53c5cbea3f372f745e1d8e4660e29f73d41517"
+  version = "v2.3.0"
 
 [[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
@@ -58,12 +58,12 @@
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 
 [[projects]]
-  digest = "1:f614e627d47e1276989de725dc5e433504a8b5498850711c9d3fcec3bfa7c943"
+  branch = "master"
+  digest = "1:2eeeebccad4f052e6037527e86b8114c6bfd184a97f84d4449a5ea6ad202c216"
   name = "github.com/maruel/panicparse"
   packages = ["stack"]
   pruneopts = "UT"
-  revision = "785840568bdc7faa0dfb1cd6c643207f03271f64"
-  version = "v1.1.1"
+  revision = "f20d4c4d746f810c9110e21928d4135e1f2a3efa"
 
 [[projects]]
   digest = "1:cdb899c199f907ac9fb50495ec71212c95cb5b0e0a8ee0800da0238036091033"
@@ -74,12 +74,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  branch = "master"
   digest = "1:abf08734a6527df70ed361d7c369fb580e6840d8f7a6012e5f609fdfd93b4e48"
   name = "github.com/mitchellh/go-wordwrap"
   packages = ["."]
   pruneopts = "UT"
   revision = "9e67c67572bc5dd02aef930e2b0ae3c02a4b5a5c"
-  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -106,7 +106,7 @@
     "context/ctxhttp",
   ]
   pruneopts = "UT"
-  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
+  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
 
 [[projects]]
   branch = "master"
@@ -140,7 +140,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Ableton/go-travis",
-    "github.com/benmatselby/go-vsts/vsts",
+    "github.com/benmatselby/go-azuredevops/azuredevops",
     "github.com/gizak/termui",
     "github.com/google/go-github/github",
     "golang.org/x/oauth2",
