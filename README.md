@@ -71,7 +71,7 @@ $ export GITHUB_TOKEN=""
 $ export GITHUB_OWNER=""
 ```
 
-You can also define `~/.precis.yml` that has the following format:
+You can also define `~/.precis/config.yml` that has the following format:
 
 ```
 travis:
@@ -96,6 +96,7 @@ $ docker run \
     -eTRAVIS_CI_OWNER \
     -eGITHUB_TOKEN \
     -eGITHUB_OWNER \
+    -v "${HOME}/.precis":/root/.precis \
     benmatselby/precis
 ```
 
