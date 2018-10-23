@@ -6,6 +6,7 @@ import (
 
 	travis "github.com/Ableton/go-travis"
 	"github.com/gizak/termui"
+	"github.com/spf13/viper"
 )
 
 func doTravis() (*termui.Table, error) {
@@ -25,10 +26,26 @@ func doTravis() (*termui.Table, error) {
 	happyRows := []int{}
 	buildRows := []int{}
 
+	ignoreRepos := viper.GetStringSlice("travis.ignore_repos")
+
 	for _, repo := range repos {
 		// Trying to remove the items that are not really running in Travis CI
 		// Assume there is a better way to do this?
 		if repo.LastBuildState == "" {
+			continue
+		}
+
+		// We may want to ignore certain repos
+		// Use cases:
+		//  - Personal and work dashboards
+		//  - Deprecated repos that may have failed a build and now abandoned
+		ignore := false
+		for _, i := range ignoreRepos {
+			if i == repo.Slug {
+				ignore = true
+			}
+		}
+		if ignore {
 			continue
 		}
 

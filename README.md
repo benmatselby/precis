@@ -71,6 +71,15 @@ $ export GITHUB_TOKEN=""
 $ export GITHUB_OWNER=""
 ```
 
+You can also define `~/.precis.yml` that has the following format:
+
+```
+travis:
+  ignore_repos:
+    - benmatselby/atom-php-checkstyle
+```
+
+
 ## Installation via Docker
 
 Other than requiring [docker](http://docker.com) to be installed, there are no other requirements to run the application this way. This is the preferred method of running the `precis`. The image is [here](https://hub.docker.com/r/benmatselby/precis/).

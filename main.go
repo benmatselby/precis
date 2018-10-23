@@ -8,6 +8,7 @@ import (
 
 	"github.com/benmatselby/precis/version"
 	"github.com/gizak/termui"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -88,6 +89,18 @@ func init() {
 	if displayGitHub && (githubOwner == "" || githubToken == "") {
 		printUsage()
 		os.Exit(1)
+	}
+
+	loadConfig()
+}
+
+func loadConfig() {
+	viper.SetConfigName(".precis")
+	viper.AddConfigPath("$HOME/")
+
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		fmt.Fprintf(os.Stderr, "Failed to load config file: %s", err)
 	}
 }
 
