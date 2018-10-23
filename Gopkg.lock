@@ -11,6 +11,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:5c2dedd31a99aead9ba2c062a8bc1b9f9156255ef95ec3b83c3e4b84d751b250"
+  name = "github.com/benmatselby/frost"
+  packages = ["jenkins"]
+  pruneopts = "UT"
+  revision = "93b04cc1f7d04d662a8c92431fd6aee62bd54114"
+
+[[projects]]
+  branch = "master"
   digest = "1:32a4531383fc6b1e897ec5f1afecbcf089a71a5bce9c45c660e31e33e20dc8eb"
   name = "github.com/benmatselby/go-azuredevops"
   packages = ["azuredevops"]
@@ -265,6 +273,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Ableton/go-travis",
+    "github.com/benmatselby/frost/jenkins",
     "github.com/benmatselby/go-azuredevops/azuredevops",
     "github.com/gizak/termui",
     "github.com/google/go-github/github",

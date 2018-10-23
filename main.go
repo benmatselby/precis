@@ -42,12 +42,18 @@ var (
 	githubOwner string
 	githubToken string
 
+	jenkinsURL      string
+	jenkinsUsername string
+	jenkinsPassword string
+	jenkinsView     string
+
 	currentIteration string
 	interval         string
 
 	displayTravis      bool
 	displayAzureDevOps bool
 	displayGitHub      bool
+	displayJenkins     bool
 
 	debug bool
 )
@@ -66,12 +72,18 @@ func init() {
 	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub CI authentication token (or define env var GITHUB_TOKEN)")
 	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub CI owner (or define env var GITHUB_OWNER)")
 
+	flag.StringVar(&jenkinsURL, "jenkins-url", os.Getenv("JENKINS_URL"), "The Jenkins URL (or define env var JENKINS_URL)")
+	flag.StringVar(&jenkinsUsername, "jenkins-username", os.Getenv("JENKINS_USERNAME"), "The Jenkins username to authenticate with (or define env var JENKINS_USERNAME)")
+	flag.StringVar(&jenkinsPassword, "jenkins-password", os.Getenv("JENKINS_PASSWORD"), "The Jenkins password to authenticate with (or define env var JENKINS_PASSWORD)")
+	flag.StringVar(&jenkinsView, "jenkins-view", os.Getenv("JENKINS_VIEW"), "The Jenkins view you want render, otherwise it is all (or define env var JENKINS_VIEW)")
+
 	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
 	flag.BoolVar(&displayAzureDevOps, "display-azure-devops", false, "Do you want to show Azure DevOps information?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
+	flag.BoolVar(&displayJenkins, "display-jenkins", true, "Do you want to show Jenkins information?")
 
 	flag.Usage = printUsage
 	flag.Parse()
@@ -87,6 +99,11 @@ func init() {
 	}
 
 	if displayGitHub && (githubOwner == "" || githubToken == "") {
+		printUsage()
+		os.Exit(1)
+	}
+
+	if displayJenkins && (jenkinsURL == "" || jenkinsUsername == "" || jenkinsPassword == "") {
 		printUsage()
 		os.Exit(1)
 	}
@@ -131,6 +148,7 @@ func main() {
 	go githubWidget(nil)
 	go azureDevOpsWidget(nil)
 	go travisWidget(nil)
+	go jenkinsWidget(nil)
 
 	// Calculate the layout.
 	termui.Body.Align()
@@ -171,6 +189,7 @@ func main() {
 			githubWidget(body)
 			azureDevOpsWidget(body)
 			travisWidget(body)
+			jenkinsWidget(body)
 
 			// Calculate the layout.
 			body.Align()
