@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/gizak/termui"
@@ -50,9 +51,7 @@ func doGitHub() (*termui.Table, error) {
 		allRepos = append(allRepos, []string{githubOwner, repo.GetName()})
 	}
 
-	rows := [][]string{
-		{"repo", "title"},
-	}
+	rows := [][]string{}
 
 	pullRequests := make(chan *github.PullRequest)
 	var wg sync.WaitGroup
@@ -84,6 +83,12 @@ func doGitHub() (*termui.Table, error) {
 	for result := range pullRequests {
 		rows = append(rows, []string{result.GetHead().GetRepo().GetFullName(), fmt.Sprintf("#%v - %s", result.GetNumber(), result.GetTitle())})
 	}
+
+	sort.Slice(rows, func(i, j int) bool {
+		return rows[i][0] < rows[j][0]
+	})
+
+	rows = append([][]string{{"repo", "title"}}, rows...)
 
 	w := termui.NewTable()
 	w.Rows = rows
