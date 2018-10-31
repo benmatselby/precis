@@ -7,7 +7,6 @@ import (
 )
 
 func doDate() *termui.Par {
-
 	w := termui.NewPar(time.Now().Local().Format("Monday, 2 January 2006 @ 15:04:05"))
 	w.Height = 3
 	w.PaddingLeft = 1
@@ -37,25 +36,4 @@ func doIterationName() *termui.Par {
 	w.BorderFg = termui.ColorWhite
 
 	return w
-}
-
-func titleWidget(body *termui.Grid) {
-	if body == nil {
-		body = termui.Body
-		// It seems that if we don't pause on the first iteration
-		// of this widget, we get a crash in docker.
-		time.Sleep(1 * time.Second)
-	}
-
-	body.AddRows(
-		termui.NewRow(
-			termui.NewCol(11, 0, doDate()),
-			termui.NewCol(1, 0, doIterationName()),
-		),
-	)
-
-	// Calculate the layout.
-	body.Align()
-	// Render the termui body.
-	termui.Render(body)
 }
