@@ -144,6 +144,16 @@ func main() {
 	}
 	defer termui.Close()
 
+	// It seems that if we don't pause on the first iteration
+	// of this widget, we get a crash in docker.
+	time.Sleep(1 * time.Second)
+
+	termui.Body.Align()
+	termui.Render(termui.Body)
+
+	displayLoading()
+	displayWidgets()
+
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
 		ticker.Stop()
 		termui.StopLoop()
@@ -157,9 +167,6 @@ func main() {
 	termui.Handle("/sys/wnd/resize", func(e termui.Event) {
 		displayWidgets()
 	})
-
-	displayLoading()
-	displayWidgets()
 
 	// Update on an interval
 	go func() {
@@ -193,7 +200,6 @@ func displayLoading() {
 	)
 
 	body.Align()
-	termui.Clear()
 	termui.Render(body)
 }
 
