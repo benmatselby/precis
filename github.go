@@ -27,7 +27,9 @@ func doGitHub() (*termui.Table, error) {
 
 	var allRepos [][]string
 	for _, org := range orgs {
-		opt := &github.RepositoryListByOrgOptions{}
+		opt := &github.RepositoryListByOrgOptions{
+			ListOptions: github.ListOptions{PerPage: 100},
+		}
 		repos, _, err := client.Repositories.ListByOrg(ctx, org.GetLogin(), opt)
 		if err != nil {
 			return nil, err
