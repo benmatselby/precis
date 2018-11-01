@@ -144,57 +144,27 @@ func main() {
 	}
 	defer termui.Close()
 
-	go titleWidget(nil)
-	go githubWidget(nil)
-	go azureDevOpsWidget(nil)
-	go travisWidget(nil)
-	go jenkinsWidget(nil)
-
-	// Calculate the layout.
-	termui.Body.Align()
-	// Render the termui body.
-	termui.Render(termui.Body)
-
-	// Handle key q pressing
 	termui.Handle("/sys/kbd/q", func(termui.Event) {
-		// press q to quit
 		ticker.Stop()
 		termui.StopLoop()
 	})
 
 	termui.Handle("/sys/kbd/C-c", func(termui.Event) {
-		// handle Ctrl + c combination
 		ticker.Stop()
 		termui.StopLoop()
 	})
 
-	// Handle resize
 	termui.Handle("/sys/wnd/resize", func(e termui.Event) {
-		termui.Body.Width = termui.TermWidth()
-		termui.Body.Align()
-		termui.Clear()
-		termui.Render(termui.Body)
+		displayWidgets()
 	})
+
+	displayLoading()
+	displayWidgets()
 
 	// Update on an interval
 	go func() {
 		for range ticker.C {
-			body := termui.NewGrid()
-			body.X = 0
-			body.Y = 0
-			body.BgColor = termui.ThemeAttr("bg")
-			body.Width = termui.TermWidth()
-
-			titleWidget(body)
-			githubWidget(body)
-			azureDevOpsWidget(body)
-			travisWidget(body)
-			jenkinsWidget(body)
-
-			// Calculate the layout.
-			body.Align()
-			// Render the termui body.
-			termui.Render(body)
+			displayWidgets()
 		}
 	}()
 
@@ -202,20 +172,118 @@ func main() {
 	termui.Loop()
 }
 
-func getFailureDisplay(target string) *termui.Table {
-	w := termui.NewTable()
-	w.Rows = [][]string{
-		{"Failure"},
+func displayLoading() {
+	body := termui.NewGrid()
+	body.X = 0
+	body.Y = 0
+	body.BgColor = termui.ThemeAttr("bg")
+	body.Width = termui.TermWidth()
+
+	w := termui.NewPar("Loading all the data")
+	w.Height = 3
+	w.PaddingLeft = 1
+	w.PaddingRight = 1
+	w.TextFgColor = termui.ColorWhite
+	w.BorderLabel = "Loading..."
+	w.BorderLabelFg = termui.ColorGreen
+	w.BorderFg = termui.ColorWhite
+
+	body.AddRows(
+		termui.NewRow(termui.NewCol(12, 0, w)),
+	)
+
+	body.Align()
+	termui.Clear()
+	termui.Render(body)
+}
+
+func displayWidgets() {
+	body := termui.NewGrid()
+	body.X = 0
+	body.Y = 0
+	body.BgColor = termui.ThemeAttr("bg")
+	body.Width = termui.TermWidth()
+
+	// Date Widgets
+	date := doDate()
+	iterationName := doIterationName()
+	body.AddRows(
+		termui.NewRow(termui.NewCol(11, 0, date), termui.NewCol(1, 0, iterationName)),
+	)
+
+	// GitHub
+	if displayGitHub == true {
+		github, err := doGitHub()
+		if err != nil {
+			stop(fmt.Sprintf("failed to get GitHub information: %v", err))
+		}
+
+		body.AddRows(
+			termui.NewRow(termui.NewCol(12, 0, github)),
+		)
 	}
-	w.FgColor = termui.ColorWhite
-	w.BgColor = termui.ColorDefault
-	w.TextAlign = termui.AlignLeft
-	w.Border = true
-	w.BorderLabelFg = termui.ColorRed
-	w.Block.BorderLabel = "Failed to get data for " + target
 
-	w.Analysis()
-	w.SetSize()
+	// Azure DevOps
+	if displayAzureDevOps {
+		builds, err := getAzureDevOpsBuilds()
+		if err != nil {
+			stop(fmt.Sprintf("failed to get Azure DevOps CI Builds information: %v", err))
+		}
 
-	return w
+		pulls, err := getAzureDevOpsPulls()
+		if err != nil {
+			stop(fmt.Sprintf("failed to get Azure DevOps Pull Requests information: %v", err))
+		}
+
+		if len(pulls.Rows) > 0 {
+			body.AddRows(
+				termui.NewRow(
+					termui.NewCol(12, 0, pulls),
+				),
+			)
+		}
+
+		if builds != nil {
+			body.AddRows(
+				termui.NewRow(
+					termui.NewCol(12, 0, builds),
+				),
+			)
+		}
+	}
+
+	// Travis
+	if displayTravis == true {
+		travis, err := doTravis()
+		if err != nil {
+			stop(fmt.Sprintf("failed to get Travis information: %v", err))
+		}
+
+		body.AddRows(
+			termui.NewRow(termui.NewCol(12, 0, travis)),
+		)
+	}
+
+	// Jenkins
+	if displayJenkins == true {
+		jenkins, err := doJenkins()
+		if err != nil {
+			stop(fmt.Sprintf("failed to get Jenkins information: %v", err))
+		}
+
+		body.AddRows(
+			termui.NewRow(termui.NewCol(12, 0, jenkins)),
+		)
+	}
+
+	body.Align()
+	termui.Clear()
+	termui.Render(body)
+}
+
+func stop(msg string) {
+	termui.StopLoop()
+	termui.Close()
+	fmt.Fprintln(os.Stderr, msg)
+	os.Exit(2)
 }

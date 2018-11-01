@@ -68,24 +68,3 @@ func doJenkins() (*termui.Table, error) {
 
 	return w, nil
 }
-
-func jenkinsWidget(body *termui.Grid) {
-	if displayJenkins == false {
-		return
-	}
-
-	if body == nil {
-		body = termui.Body
-	}
-
-	jenkins, err := doJenkins()
-	if err != nil {
-		jenkins = getFailureDisplay("Jenkins Builds")
-	}
-	if jenkins != nil {
-		body.AddRows(termui.NewRow(termui.NewCol(12, 0, jenkins)))
-
-		body.Align()
-		termui.Render(body)
-	}
-}

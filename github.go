@@ -103,26 +103,3 @@ func doGitHub() (*termui.Table, error) {
 
 	return w, nil
 }
-
-func githubWidget(body *termui.Grid) {
-	if displayGitHub == false {
-		return
-	}
-
-	if body == nil {
-		body = termui.Body
-	}
-
-	github, err := doGitHub()
-	if err != nil {
-		github = getFailureDisplay(err.Error())
-	}
-	if github != nil {
-		body.AddRows(termui.NewRow(termui.NewCol(12, 0, github)))
-
-		// Calculate the layout.
-		body.Align()
-		// Render the termui body.
-		termui.Render(body)
-	}
-}

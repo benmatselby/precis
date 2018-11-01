@@ -97,26 +97,3 @@ func doTravis() (*termui.Table, error) {
 
 	return w, nil
 }
-
-func travisWidget(body *termui.Grid) {
-	if displayTravis == false {
-		return
-	}
-
-	if body == nil {
-		body = termui.Body
-	}
-
-	travis, err := doTravis()
-	if err != nil {
-		travis = getFailureDisplay("Travis CI Builds")
-	}
-	if travis != nil {
-		body.AddRows(termui.NewRow(termui.NewCol(12, 0, travis)))
-
-		// Calculate the layout.
-		body.Align()
-		// Render the termui body.
-		termui.Render(body)
-	}
-}
