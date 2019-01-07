@@ -115,7 +115,7 @@ $ docker run \
     -eJENKINS_PASSWORD \
     -eJENKINS_VIEW \
     -v "${HOME}/.precis":/root/.precis \
-    benmatselby/precis
+    benmatselby/precis "$@"
 ```
 
 ## Installation via Git
