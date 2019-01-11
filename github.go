@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/gizak/termui"
 	"github.com/google/go-github/github"
+	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 )
 
@@ -36,6 +38,9 @@ func doGitHub() (*termui.Table, error) {
 		}
 
 		for _, repo := range repos {
+			if !showRepoPr(org.GetLogin(), repo.GetName()) {
+				continue
+			}
 			allRepos = append(allRepos, []string{org.GetLogin(), repo.GetName()})
 		}
 	}
@@ -48,6 +53,9 @@ func doGitHub() (*termui.Table, error) {
 
 	for _, repo := range repos {
 		if repo.GetFork() {
+			continue
+		}
+		if !showRepoPr(githubOwner, repo.GetName()) {
 			continue
 		}
 		allRepos = append(allRepos, []string{githubOwner, repo.GetName()})
@@ -104,4 +112,38 @@ func doGitHub() (*termui.Table, error) {
 	w.SetSize()
 
 	return w, nil
+}
+
+// showRepoPr is going to determine if we care enough to show the detail
+func showRepoPr(org, name string) bool {
+	watchRepos := viper.GetStringSlice("github.pull_request_repos")
+
+	if len(watchRepos) == 0 {
+		return true
+	}
+
+	show := false
+	for _, i := range watchRepos {
+		s := strings.Split(i, "/")
+
+		// If we want to watch everything for a given org
+		if s[1] == "*" && org == s[0] {
+			show = true
+			break
+		}
+
+		// If we want to watch everything for a given repo (including forks)
+		if s[0] == "*" && name == s[1] {
+			show = true
+			break
+		}
+
+		// Otherwise we want an exact match
+		if i == fmt.Sprintf("%s/%s", org, name) {
+			show = true
+			break
+		}
+	}
+
+	return show
 }

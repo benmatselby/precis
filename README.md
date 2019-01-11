@@ -13,7 +13,7 @@ It integrates with:
 
 ## Usage
 
-```
+```shell
 .______   .______       _______   ______  __       _______.
 |   _  \  |   _  \     |   ____| /      ||  |     /       |
 |  |_)  | |  |_)  |    |  |__   |  ,----'|  |    |   (----
@@ -71,34 +71,45 @@ Build:
 
 You will need the following environment variables defining, depending on which systems you are running in the dashboard:
 
-```
-$ export AZURE_DEVOPS_ACCOUNT=""
-$ export AZURE_DEVOPS_PROJECT=""
-$ export AZURE_DEVOPS_TEAM=""
-$ export AZURE_DEVOPS_TOKEN=""
-$ export TRAVIS_CI_TOKEN=""
-$ export TRAVIS_CI_OWNER=""
-$ export GITHUB_TOKEN=""
-$ export GITHUB_OWNER=""
-$ export JENKINS_URL=""
-$ export JENKINS_USERNAME=""
-$ export JENKINS_PASSWORD=""
-$ export JENKINS_VIEW=""
+```shell
+export AZURE_DEVOPS_ACCOUNT=""
+export AZURE_DEVOPS_PROJECT=""
+export AZURE_DEVOPS_TEAM=""
+export AZURE_DEVOPS_TOKEN=""
+export TRAVIS_CI_TOKEN=""
+export TRAVIS_CI_OWNER=""
+export GITHUB_TOKEN=""
+export GITHUB_OWNER=""
+export JENKINS_URL=""
+export JENKINS_USERNAME=""
+export JENKINS_PASSWORD=""
+export JENKINS_VIEW=""
 ```
 
-You can also define `~/.precis/config.yml` that has the following format:
+You can also define `~/.precis/config.yml` which has various settings.
 
-```
+### Ignoring certain repos in Travis
+
+```shell
 travis:
   ignore_repos:
     - benmatselby/atom-php-checkstyle
+```
+
+### Limiting the repos to show Pull Requests for
+
+```shell
+github:
+  pull_request_repos:
+  - my-org/my-repo
+  - benmatselby/*
 ```
 
 ## Installation via Docker
 
 Other than requiring [docker](http://docker.com) to be installed, there are no other requirements to run the application this way. This is the preferred method of running the `precis`. The image is [here](https://hub.docker.com/r/benmatselby/precis/).
 
-```
+```shell
 $ docker run \
     --rm \
     -t \
@@ -120,9 +131,9 @@ $ docker run \
 
 ## Installation via Git
 
-```
-$ git clone git@github.com:benmatselby/precis.git
-$ cd precis
-$ make all
-$ ./precis
+```shell
+git clone git@github.com:benmatselby/precis.git
+cd precis
+make all
+./precis
 ```
