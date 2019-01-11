@@ -50,10 +50,9 @@ var (
 	currentIteration string
 	interval         string
 
-	displayTravis      bool
+	displayBuild       bool
 	displayAzureDevOps bool
 	displayGitHub      bool
-	displayJenkins     bool
 
 	debug bool
 )
@@ -80,15 +79,14 @@ func init() {
 	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
-	flag.BoolVar(&displayTravis, "display-travis", true, "Do you want to show Travis CI information?")
+	flag.BoolVar(&displayBuild, "display-displayBuild", true, "Do you want to show build information from TravisCI and Jenkins?")
 	flag.BoolVar(&displayAzureDevOps, "display-azure-devops", false, "Do you want to show Azure DevOps information?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
-	flag.BoolVar(&displayJenkins, "display-jenkins", true, "Do you want to show Jenkins information?")
 
 	flag.Usage = printUsage
 	flag.Parse()
 
-	if displayTravis && (travisToken == "" || travisOwner == "") {
+	if displayBuild && (travisToken == "" || travisOwner == "") {
 		printUsage()
 		os.Exit(1)
 	}
@@ -103,7 +101,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	if displayJenkins && (jenkinsURL == "" || jenkinsUsername == "" || jenkinsPassword == "") {
+	if displayBuild && (jenkinsURL == "" || jenkinsUsername == "" || jenkinsPassword == "") {
 		printUsage()
 		os.Exit(1)
 	}
@@ -259,26 +257,22 @@ func displayWidgets() {
 	}
 
 	// Travis
-	if displayTravis {
+	if displayBuild {
 		travis, err := doTravis()
 		if err != nil {
 			stop(fmt.Sprintf("failed to get Travis information: %v", err))
 		}
 
-		body.AddRows(
-			termui.NewRow(termui.NewCol(12, 0, travis)),
-		)
-	}
-
-	// Jenkins
-	if displayJenkins {
 		jenkins, err := doJenkins()
 		if err != nil {
 			stop(fmt.Sprintf("failed to get Jenkins information: %v", err))
 		}
 
 		body.AddRows(
-			termui.NewRow(termui.NewCol(12, 0, jenkins)),
+			termui.NewRow(
+				termui.NewCol(6, 0, travis),
+				termui.NewCol(6, 0, jenkins),
+			),
 		)
 	}
 
