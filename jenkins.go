@@ -21,12 +21,15 @@ func doJenkins() (*termui.Table, error) {
 	sadRows := []int{}
 	happyRows := []int{}
 	buildRows := []int{}
+	waitRows := []int{}
 
 	for _, job := range jobs {
-		if job.LastBuild.Result == "" {
-			// Assumption made here is that this is a folder/pipline entry
-			// with no useful information to render
-			continue
+		if job.LastBuild.Result == "" && job.LastBuild.Timestamp != 0 {
+			job.LastBuild.Result = "RUNNING"
+		}
+
+		if job.LastBuild.Result == "" && job.LastBuild.Timestamp == 0 {
+			job.LastBuild.Result = "WAITING"
 		}
 
 		finishedAt := time.Unix(0, int64(time.Millisecond)*job.LastBuild.Timestamp).Format("02-01-2006 15:04")
@@ -37,6 +40,8 @@ func doJenkins() (*termui.Table, error) {
 			sadRows = append(sadRows, len(rows)-1)
 		} else if job.LastBuild.Result == "RUNNING" {
 			buildRows = append(buildRows, len(rows)-1)
+		} else if job.LastBuild.Result == "WAITING" {
+			waitRows = append(waitRows, len(rows)-1)
 		} else {
 			happyRows = append(happyRows, len(rows)-1)
 		}
@@ -60,6 +65,10 @@ func doJenkins() (*termui.Table, error) {
 
 	for _, line := range buildRows {
 		w.FgColors[line] = termui.ColorYellow
+	}
+
+	for _, line := range waitRows {
+		w.FgColors[line] = termui.ColorCyan
 	}
 
 	for _, line := range happyRows {
