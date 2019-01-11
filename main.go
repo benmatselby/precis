@@ -218,7 +218,7 @@ func displayWidgets() {
 	)
 
 	// GitHub
-	if displayGitHub == true {
+	if displayGitHub {
 		github, err := doGitHub()
 		if err != nil {
 			stop(fmt.Sprintf("failed to get GitHub information: %v", err))
@@ -259,7 +259,7 @@ func displayWidgets() {
 	}
 
 	// Travis
-	if displayTravis == true {
+	if displayTravis {
 		travis, err := doTravis()
 		if err != nil {
 			stop(fmt.Sprintf("failed to get Travis information: %v", err))
@@ -271,7 +271,7 @@ func displayWidgets() {
 	}
 
 	// Jenkins
-	if displayJenkins == true {
+	if displayJenkins {
 		jenkins, err := doJenkins()
 		if err != nil {
 			stop(fmt.Sprintf("failed to get Jenkins information: %v", err))
