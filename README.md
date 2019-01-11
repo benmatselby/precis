@@ -94,6 +94,15 @@ travis:
     - benmatselby/atom-php-checkstyle
 ```
 
+### Limiting the repos to show Pull Requests for
+
+```shell
+github:
+  pull_request_repos:
+  - my-org/my-repo
+  - benmatselby/*
+```
+
 ## Installation via Docker
 
 Other than requiring [docker](http://docker.com) to be installed, there are no other requirements to run the application this way. This is the preferred method of running the `precis`. The image is [here](https://hub.docker.com/r/benmatselby/precis/).
