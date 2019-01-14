@@ -79,7 +79,7 @@ func init() {
 	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
-	flag.BoolVar(&displayBuild, "display-displayBuild", true, "Do you want to show build information from TravisCI and Jenkins?")
+	flag.BoolVar(&displayBuild, "display-build", true, "Do you want to show build information from TravisCI and Jenkins?")
 	flag.BoolVar(&displayAzureDevOps, "display-azure-devops", false, "Do you want to show Azure DevOps information?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
 
