@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/benmatselby/frost/jenkins"
+	"github.com/benmatselby/precis/jenkins"
 	"github.com/gizak/termui"
 )
 
