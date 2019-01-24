@@ -65,6 +65,12 @@ Build:
     	The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)
 ```
 
+## Requirements
+
+If you are wanting to build and develop this, you will need the following items installed.
+
+- Go version 1.11+
+
 ## Configuration
 
 You will need the following environment variables defining, depending on which systems you are running in the dashboard:
@@ -135,3 +141,5 @@ cd precis
 make all
 ./precis
 ```
+
+You can also install into your `$GOPATH/bin` by `go install`
