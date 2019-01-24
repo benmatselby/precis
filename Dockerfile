@@ -4,6 +4,7 @@ LABEL maintainer="Ben Selby <benmatselby@gmail.com>"
 ENV APPNAME precis
 ENV PATH /go/bin:/usr/local/go/bin:$PATH
 ENV GOPATH /go
+ENV GO111MODULE on
 
 COPY . /go/src/github.com/benmatselby/${APPNAME}
 
