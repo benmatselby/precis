@@ -219,7 +219,7 @@ func displayWidgets() {
 	if displayGitHub {
 		github, err := doGitHub()
 		if err != nil {
-			stop(fmt.Sprintf("failed to get GitHub information: %v", err))
+			github = renderError("GitHub", err.Error())
 		}
 
 		body.AddRows(
@@ -229,14 +229,9 @@ func displayWidgets() {
 
 	// Azure DevOps
 	if displayAzureDevOps {
-		builds, err := getAzureDevOpsBuilds()
-		if err != nil {
-			stop(fmt.Sprintf("failed to get Azure DevOps CI Builds information: %v", err))
-		}
-
 		pulls, err := getAzureDevOpsPulls()
 		if err != nil {
-			stop(fmt.Sprintf("failed to get Azure DevOps Pull Requests information: %v", err))
+			pulls = renderError("Azure DevOps Pull Requests", err.Error())
 		}
 
 		if len(pulls.Rows) > 0 {
@@ -245,6 +240,11 @@ func displayWidgets() {
 					termui.NewCol(12, 0, pulls),
 				),
 			)
+		}
+
+		builds, err := getAzureDevOpsBuilds()
+		if err != nil {
+			builds = renderError("Azure DevOps Builds", err.Error())
 		}
 
 		if builds != nil {
@@ -260,12 +260,12 @@ func displayWidgets() {
 	if displayBuild {
 		travis, err := doTravis()
 		if err != nil {
-			stop(fmt.Sprintf("failed to get Travis information: %v", err))
+			travis = renderError("Travis", err.Error())
 		}
 
 		jenkins, err := doJenkins()
 		if err != nil {
-			stop(fmt.Sprintf("failed to get Jenkins information: %v", err))
+			jenkins = renderError("Jenkins", err.Error())
 		}
 
 		body.AddRows(
@@ -286,4 +286,18 @@ func stop(msg string) {
 	termui.Close()
 	fmt.Fprintln(os.Stderr, msg)
 	os.Exit(2)
+}
+
+func renderError(service, msg string) *termui.Table {
+	w := termui.NewTable()
+	w.Rows = [][]string{{"Failed: " + msg}}
+	w.FgColor = termui.ColorWhite
+	w.BgColor = termui.ColorDefault
+	w.TextAlign = termui.AlignLeft
+	w.Border = true
+	w.BorderLabelFg = termui.ColorRed
+	w.Block.BorderLabel = service
+	w.Analysis()
+	w.SetSize()
+	return w
 }
