@@ -7,13 +7,14 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/gizak/termui"
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 	"github.com/google/go-github/github"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 )
 
-func doGitHub() (*termui.Table, error) {
+func getGitHub() *widgets.Table {
 	ctx := context.Background()
 
 	ts := oauth2.StaticTokenSource(
@@ -24,7 +25,7 @@ func doGitHub() (*termui.Table, error) {
 
 	orgs, _, err := client.Organizations.List(context.Background(), githubOwner, nil)
 	if err != nil {
-		return nil, err
+		return renderError("GitHub", err.Error())
 	}
 
 	var allRepos [][]string
@@ -34,7 +35,7 @@ func doGitHub() (*termui.Table, error) {
 		}
 		repos, _, err := client.Repositories.ListByOrg(ctx, org.GetLogin(), opt)
 		if err != nil {
-			return nil, err
+			return renderError("GitHub", err.Error())
 		}
 
 		for _, repo := range repos {
@@ -48,7 +49,7 @@ func doGitHub() (*termui.Table, error) {
 	opt := &github.RepositoryListOptions{}
 	repos, _, err := client.Repositories.List(ctx, githubOwner, opt)
 	if err != nil {
-		return nil, err
+		return renderError("GitHub", err.Error())
 	}
 
 	for _, repo := range repos {
@@ -100,18 +101,14 @@ func doGitHub() (*termui.Table, error) {
 
 	rows = append([][]string{{"repo", "title"}}, rows...)
 
-	w := termui.NewTable()
+	w := widgets.NewTable()
 	w.Rows = rows
-	w.FgColor = termui.ColorWhite
-	w.BgColor = termui.ColorDefault
-	w.TextAlign = termui.AlignLeft
+	w.TextStyle = ui.NewStyle(ui.ColorWhite)
+	w.TextAlignment = ui.AlignLeft
 	w.Border = true
-	w.Block.BorderLabel = "GitHub Pull Requests - " + githubOwner
+	w.Title = "GitHub Pull Requests - " + githubOwner
 
-	w.Analysis()
-	w.SetSize()
-
-	return w, nil
+	return w
 }
 
 // showRepoPr is going to determine if we care enough to show the detail

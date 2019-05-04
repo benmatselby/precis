@@ -7,7 +7,6 @@ CLI application for getting information out of various systems in a neat dashboa
 It integrates with:
 
 - GitHub
-- Azure DevOps
 - TravisCI
 - Jenkins
 
@@ -25,22 +24,6 @@ A terminal dashboard which gives an overview of useful things
 
 Build:
 
-  -azure-devops-account string
-    	The Visual Studio Team Services account (or define env var AZURE_DEVOPS_ACCOUNT)
-  -azure-devops-build-branch string
-    	Comma separated list of branches to display (default "master")
-  -azure-devops-build-count int
-    	How many builds should we display (default 10)
-  -azure-devops-project string
-    	The Visual Studio Team Services project (or define env var AZURE_DEVOPS_PROJECT)
-  -azure-devops-team string
-    	The Visual Studio Team Services team (or define env var AZURE_DEVOPS_TEAM)
-  -azure-devops-token string
-    	The Visual Studio Team Services auth token (or define env var AZURE_DEVOPS_TOKEN)
-  -current-iteration string
-    	What is the current iteration
-  -display-azure-devops
-    	Do you want to show Azure DevOps information?
   -display-build
         Do you want to show build information from TravisCI and Jenkins? (default true)
   -display-github
@@ -76,10 +59,6 @@ If you are wanting to build and develop this, you will need the following items 
 You will need the following environment variables defining, depending on which systems you are running in the dashboard:
 
 ```shell
-export AZURE_DEVOPS_ACCOUNT=""
-export AZURE_DEVOPS_PROJECT=""
-export AZURE_DEVOPS_TEAM=""
-export AZURE_DEVOPS_TOKEN=""
 export TRAVIS_CI_TOKEN=""
 export TRAVIS_CI_OWNER=""
 export GITHUB_TOKEN=""
@@ -107,30 +86,6 @@ github:
   pull_request_repos:
   - my-org/my-repo
   - benmatselby/*
-```
-
-## Installation via Docker
-
-Other than requiring [docker](http://docker.com) to be installed, there are no other requirements to run the application this way. This is the preferred method of running the `precis`. The image is [here](https://hub.docker.com/r/benmatselby/precis/).
-
-```shell
-$ docker run \
-    --rm \
-    -t \
-    -eAZURE_DEVOPS_ACCOUNT \
-    -eAZURE_DEVOPS_PROJECT \
-    -eAZURE_DEVOPS_TEAM \
-    -eAZURE_DEVOPS_TOKEN \
-    -eTRAVIS_CI_TOKEN \
-    -eTRAVIS_CI_OWNER \
-    -eGITHUB_TOKEN \
-    -eGITHUB_OWNER \
-    -eJENKINS_URL \
-    -eJENKINS_USERNAME \
-    -eJENKINS_PASSWORD \
-    -eJENKINS_VIEW \
-    -v "${HOME}/.precis":/root/.precis \
-    benmatselby/precis "$@"
 ```
 
 ## Installation via Git

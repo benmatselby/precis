@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"github.com/benmatselby/precis/version"
-	"github.com/gizak/termui"
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 	"github.com/spf13/viper"
 )
 
@@ -32,13 +33,6 @@ var (
 	travisToken string
 	travisOwner string
 
-	azureDevOpsAccount           string
-	azureDevOpsProject           string
-	azureDevOpsTeam              string
-	azureDevOpsToken             string
-	azureDevOpsBuildBranchFilter string
-	azureDevOpsBuildCount        int
-
 	githubOwner string
 	githubToken string
 
@@ -47,26 +41,17 @@ var (
 	jenkinsPassword string
 	jenkinsView     string
 
-	currentIteration string
-	interval         string
+	interval string
 
-	displayBuild       bool
-	displayAzureDevOps bool
-	displayGitHub      bool
+	displayBuild  bool
+	displayGitHub bool
 
-	debug bool
+	grid *ui.Grid
 )
 
 func init() {
 	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)")
 	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner (or define env var TRAVIS_CI_OWNER)")
-
-	flag.StringVar(&azureDevOpsAccount, "azure-devops-account", os.Getenv("AZURE_DEVOPS_ACCOUNT"), "The Visual Studio Team Services account (or define env var AZURE_DEVOPS_ACCOUNT)")
-	flag.StringVar(&azureDevOpsProject, "azure-devops-project", os.Getenv("AZURE_DEVOPS_PROJECT"), "The Visual Studio Team Services project (or define env var AZURE_DEVOPS_PROJECT)")
-	flag.StringVar(&azureDevOpsTeam, "azure-devops-team", os.Getenv("AZURE_DEVOPS_TEAM"), "The Visual Studio Team Services team (or define env var AZURE_DEVOPS_TEAM)")
-	flag.StringVar(&azureDevOpsToken, "azure-devops-token", os.Getenv("AZURE_DEVOPS_TOKEN"), "The Visual Studio Team Services auth token (or define env var AZURE_DEVOPS_TOKEN)")
-	flag.IntVar(&azureDevOpsBuildCount, "azure-devops-build-count", 10, "How many builds should we display")
-	flag.StringVar(&azureDevOpsBuildBranchFilter, "azure-devops-build-branch", "master", "Comma separated list of branches to display")
 
 	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub CI authentication token (or define env var GITHUB_TOKEN)")
 	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub CI owner (or define env var GITHUB_OWNER)")
@@ -76,22 +61,15 @@ func init() {
 	flag.StringVar(&jenkinsPassword, "jenkins-password", os.Getenv("JENKINS_PASSWORD"), "The Jenkins password to authenticate with (or define env var JENKINS_PASSWORD)")
 	flag.StringVar(&jenkinsView, "jenkins-view", os.Getenv("JENKINS_VIEW"), "The Jenkins view you want render, otherwise it is all (or define env var JENKINS_VIEW)")
 
-	flag.StringVar(&currentIteration, "current-iteration", "", "What is the current iteration")
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
 	flag.BoolVar(&displayBuild, "display-build", true, "Do you want to show build information from TravisCI and Jenkins?")
-	flag.BoolVar(&displayAzureDevOps, "display-azure-devops", false, "Do you want to show Azure DevOps information?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
 
 	flag.Usage = printUsage
 	flag.Parse()
 
 	if displayBuild && (travisToken == "" || travisOwner == "") {
-		printUsage()
-		os.Exit(1)
-	}
-
-	if displayAzureDevOps && (azureDevOpsAccount == "" || azureDevOpsProject == "" || azureDevOpsTeam == "" || azureDevOpsToken == "") {
 		printUsage()
 		os.Exit(1)
 	}
@@ -135,169 +113,114 @@ func main() {
 	}
 	ticker = time.NewTicker(dur)
 
-	// Initialize termui.
-	if err := termui.Init(); err != nil {
+	// Initialize ui.
+	if err := ui.Init(); err != nil {
 		fmt.Fprintf(os.Stderr, "initializing termui failed: %v", err)
 		os.Exit(2)
 	}
-	defer termui.Close()
-
-	// It seems that if we don't pause on the first iteration
-	// of this widget, we get a crash in docker.
-	time.Sleep(1 * time.Second)
-
-	termui.Body.Align()
-	termui.Render(termui.Body)
+	defer ui.Close()
 
 	displayLoading()
 	displayWidgets()
 
-	termui.Handle("/sys/kbd/q", func(termui.Event) {
-		ticker.Stop()
-		termui.StopLoop()
-	})
-
-	termui.Handle("/sys/kbd/C-c", func(termui.Event) {
-		ticker.Stop()
-		termui.StopLoop()
-	})
-
-	termui.Handle("/sys/wnd/resize", func(e termui.Event) {
-		displayWidgets()
-	})
-
-	// Update on an interval
-	go func() {
-		for range ticker.C {
+	uiEvents := ui.PollEvents()
+	for {
+		select {
+		case e := <-uiEvents:
+			switch e.ID {
+			case "q", "<C-c>":
+				return
+			case "<Resize>":
+				payload := e.Payload.(ui.Resize)
+				grid.SetRect(0, 0, payload.Width, payload.Height)
+				ui.Clear()
+				ui.Render(grid)
+			}
+		case <-ticker.C:
 			displayWidgets()
 		}
-	}()
-
-	// Start the loop.
-	termui.Loop()
+	}
 }
 
-func displayLoading() {
-	body := termui.NewGrid()
-	body.X = 0
-	body.Y = 0
-	body.BgColor = termui.ThemeAttr("bg")
-	body.Width = termui.TermWidth()
-
-	w := termui.NewPar("Loading all the data")
-	w.Height = 3
+func getDateTime() *widgets.Paragraph {
+	w := widgets.NewParagraph()
+	w.Text = time.Now().Local().Format("Monday, 2 January 2006 @ 15:04:05")
 	w.PaddingLeft = 1
 	w.PaddingRight = 1
-	w.TextFgColor = termui.ColorWhite
-	w.BorderLabel = "Loading..."
-	w.BorderLabelFg = termui.ColorGreen
-	w.BorderFg = termui.ColorWhite
-
-	body.AddRows(
-		termui.NewRow(termui.NewCol(12, 0, w)),
-	)
-
-	body.Align()
-	termui.Render(body)
+	w.Title = "Today"
+	return w
 }
 
 func displayWidgets() {
-	body := termui.NewGrid()
-	body.X = 0
-	body.Y = 0
-	body.BgColor = termui.ThemeAttr("bg")
-	body.Width = termui.TermWidth()
+	grid = ui.NewGrid()
+	termWidth, termHeight := ui.TerminalDimensions()
+	grid.SetRect(0, 0, termWidth, termHeight)
 
-	// Date Widgets
-	date := doDate()
-	iterationName := doIterationName()
-	body.AddRows(
-		termui.NewRow(termui.NewCol(11, 0, date), termui.NewCol(1, 0, iterationName)),
-	)
+	if displayBuild && displayGitHub {
+		github := getGitHub()
+		jenkins := getJenkins()
+		travis := getTravis()
 
-	// GitHub
-	if displayGitHub {
-		github, err := doGitHub()
-		if err != nil {
-			github = renderError("GitHub", err.Error())
-		}
-
-		body.AddRows(
-			termui.NewRow(termui.NewCol(12, 0, github)),
+		grid.Set(
+			ui.NewRow(1.0/9,
+				getDateTime(),
+			),
+			ui.NewRow(4.5/10,
+				ui.NewCol(1.0, github),
+			),
+			ui.NewRow(4.5/10,
+				ui.NewCol(1.0/2, travis),
+				ui.NewCol(1.0/2, jenkins),
+			),
 		)
-	}
-
-	// Azure DevOps
-	if displayAzureDevOps {
-		pulls, err := getAzureDevOpsPulls()
-		if err != nil {
-			pulls = renderError("Azure DevOps Pull Requests", err.Error())
-		}
-
-		if len(pulls.Rows) > 0 {
-			body.AddRows(
-				termui.NewRow(
-					termui.NewCol(12, 0, pulls),
-				),
-			)
-		}
-
-		builds, err := getAzureDevOpsBuilds()
-		if err != nil {
-			builds = renderError("Azure DevOps Builds", err.Error())
-		}
-
-		if builds != nil {
-			body.AddRows(
-				termui.NewRow(
-					termui.NewCol(12, 0, builds),
-				),
-			)
-		}
-	}
-
-	// Travis
-	if displayBuild {
-		travis, err := doTravis()
-		if err != nil {
-			travis = renderError("Travis", err.Error())
-		}
-
-		jenkins, err := doJenkins()
-		if err != nil {
-			jenkins = renderError("Jenkins", err.Error())
-		}
-
-		body.AddRows(
-			termui.NewRow(
-				termui.NewCol(6, 0, travis),
-				termui.NewCol(6, 0, jenkins),
+	} else if displayBuild && !displayGitHub {
+		jenkins := getJenkins()
+		travis := getTravis()
+		grid.Set(
+			ui.NewRow(1.0/9,
+				getDateTime(),
+			),
+			ui.NewRow(9.0/10,
+				ui.NewCol(1.0/2, travis),
+				ui.NewCol(1.0/2, jenkins),
+			),
+		)
+	} else if displayGitHub && !displayBuild {
+		github := getGitHub()
+		grid.Set(
+			ui.NewRow(1.0/9,
+				getDateTime(),
+			),
+			ui.NewRow(9.0/10,
+				ui.NewCol(1.0, github),
 			),
 		)
 	}
 
-	body.Align()
-	termui.Clear()
-	termui.Render(body)
+	ui.Render(grid)
 }
 
-func stop(msg string) {
-	termui.StopLoop()
-	termui.Close()
-	fmt.Fprintln(os.Stderr, msg)
-	os.Exit(2)
+func displayLoading() {
+	w := widgets.NewParagraph()
+	w.Text = "Loading all the data"
+	w.PaddingLeft = 1
+	w.PaddingRight = 1
+
+	grid = ui.NewGrid()
+	termWidth, termHeight := ui.TerminalDimensions()
+	grid.SetRect(0, 0, termWidth, termHeight)
+
+	grid.Set(
+		ui.NewRow(1.0, w),
+	)
+	ui.Render(grid)
 }
 
-func renderError(service, msg string) *termui.Table {
-	w := termui.NewTable()
+func renderError(service, msg string) *widgets.Table {
+	w := widgets.NewTable()
 	w.Rows = [][]string{{"Failed: " + msg}}
-	w.FgColor = termui.ColorWhite
-	w.BgColor = termui.ColorDefault
-	w.TextAlign = termui.AlignLeft
 	w.Border = true
-	w.BorderLabelFg = termui.ColorRed
-	w.Block.BorderLabel = service
-	w.Analysis()
-	w.SetSize()
+	w.Title = service
+	w.TitleStyle = ui.Style{Fg: ui.ColorRed}
 	return w
 }
