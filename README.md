@@ -109,30 +109,6 @@ github:
   - benmatselby/*
 ```
 
-## Installation via Docker
-
-Other than requiring [docker](http://docker.com) to be installed, there are no other requirements to run the application this way. This is the preferred method of running the `precis`. The image is [here](https://hub.docker.com/r/benmatselby/precis/).
-
-```shell
-$ docker run \
-    --rm \
-    -t \
-    -eAZURE_DEVOPS_ACCOUNT \
-    -eAZURE_DEVOPS_PROJECT \
-    -eAZURE_DEVOPS_TEAM \
-    -eAZURE_DEVOPS_TOKEN \
-    -eTRAVIS_CI_TOKEN \
-    -eTRAVIS_CI_OWNER \
-    -eGITHUB_TOKEN \
-    -eGITHUB_OWNER \
-    -eJENKINS_URL \
-    -eJENKINS_USERNAME \
-    -eJENKINS_PASSWORD \
-    -eJENKINS_VIEW \
-    -v "${HOME}/.precis":/root/.precis \
-    benmatselby/precis "$@"
-```
-
 ## Installation via Git
 
 ```shell

@@ -1,5 +1,4 @@
 NAME := precis
-DOCKER_PREFIX = benmatselby
 
 .DEFAULT_GOAL := explain
 .PHONY: explain
