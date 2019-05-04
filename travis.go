@@ -5,16 +5,17 @@ import (
 	"time"
 
 	travis "github.com/Ableton/go-travis"
-	"github.com/gizak/termui"
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 	"github.com/spf13/viper"
 )
 
-func doTravis() (*termui.Table, error) {
+func getTravis() *widgets.Table {
 	client := travis.NewClient(travis.TRAVIS_API_DEFAULT_URL, travisToken)
 	opt := &travis.RepositoryListOptions{Member: travisOwner, Active: true}
 	repos, _, err := client.Repositories.Find(opt)
 	if err != nil {
-		return nil, err
+		return renderError("Travis", err.Error())
 	}
 
 	sort.Slice(repos, func(i, j int) bool { return repos[i].LastBuildFinishedAt > repos[j].LastBuildFinishedAt })
@@ -51,7 +52,7 @@ func doTravis() (*termui.Table, error) {
 
 		branch, _, err := client.Branches.GetFromSlug(repo.Slug, "master")
 		if err != nil {
-			return nil, err
+			return renderError("Travis", err.Error())
 		}
 
 		finish, error := time.Parse(time.RFC3339, branch.FinishedAt)
@@ -71,29 +72,25 @@ func doTravis() (*termui.Table, error) {
 		}
 	}
 
-	w := termui.NewTable()
+	w := widgets.NewTable()
 	w.Rows = rows
-	w.FgColor = termui.ColorWhite
-	w.BgColor = termui.ColorDefault
-	w.TextAlign = termui.AlignLeft
+	w.TextStyle = ui.NewStyle(ui.ColorWhite)
+	w.TextAlignment = ui.AlignLeft
 	w.Border = true
-	w.BorderLabelFg = termui.ColorGreen
-	w.Block.BorderLabel = "Travis CI Builds - " + travisOwner
-
-	w.Analysis()
-	w.SetSize()
+	w.Title = "TravisCI Builds - " + travisOwner
+	w.TitleStyle = ui.Style{Fg: ui.ColorGreen}
 
 	for _, line := range sadRows {
-		w.FgColors[line] = termui.ColorRed
+		w.RowStyles[line] = ui.Style{Fg: ui.ColorRed}
 	}
 
 	for _, line := range buildRows {
-		w.FgColors[line] = termui.ColorYellow
+		w.RowStyles[line] = ui.Style{Fg: ui.ColorYellow}
 	}
 
 	for _, line := range happyRows {
-		w.FgColors[line] = termui.ColorDefault
+		w.RowStyles[line] = ui.Style{Fg: ui.ColorGreen}
 	}
 
-	return w, nil
+	return w
 }
