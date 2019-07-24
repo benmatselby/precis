@@ -69,7 +69,7 @@ export JENKINS_PASSWORD=""
 export JENKINS_VIEW=""
 ```
 
-You can also define `~/.precis/config.yml` which has various settings.
+You can also define `~/.benmatselby/precis.yml` which has various settings.
 
 ### Ignoring certain repos in Travis
 
