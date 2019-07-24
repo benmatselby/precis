@@ -88,8 +88,8 @@ func init() {
 }
 
 func loadConfig() {
-	viper.SetConfigName("config")
-	viper.AddConfigPath("$HOME/.precis")
+	viper.SetConfigName("precis")
+	viper.AddConfigPath("$HOME/.benmatselby")
 
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
