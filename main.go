@@ -30,9 +30,6 @@ Build: %s
 )
 
 var (
-	travisToken string
-	travisOwner string
-
 	githubOwner string
 	githubToken string
 
@@ -50,9 +47,6 @@ var (
 )
 
 func init() {
-	flag.StringVar(&travisToken, "travis-token", os.Getenv("TRAVIS_CI_TOKEN"), "The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)")
-	flag.StringVar(&travisOwner, "travis-owner", os.Getenv("TRAVIS_CI_OWNER"), "The Travis CI owner (or define env var TRAVIS_CI_OWNER)")
-
 	flag.StringVar(&githubToken, "github-token", os.Getenv("GITHUB_TOKEN"), "The GitHub CI authentication token (or define env var GITHUB_TOKEN)")
 	flag.StringVar(&githubOwner, "github-owner", os.Getenv("GITHUB_OWNER"), "The GitHub CI owner (or define env var GITHUB_OWNER)")
 
@@ -63,16 +57,11 @@ func init() {
 
 	flag.StringVar(&interval, "interval", "60s", "The refresh rate for the dashboard")
 
-	flag.BoolVar(&displayBuild, "display-build", true, "Do you want to show build information from TravisCI and Jenkins?")
+	flag.BoolVar(&displayBuild, "display-build", true, "Do you want to show build information from Jenkins?")
 	flag.BoolVar(&displayGitHub, "display-github", true, "Do you want to show GitHub information?")
 
 	flag.Usage = printUsage
 	flag.Parse()
-
-	if displayBuild && (travisToken == "" || travisOwner == "") {
-		printUsage()
-		os.Exit(1)
-	}
 
 	if displayGitHub && (githubOwner == "" || githubToken == "") {
 		printUsage()
@@ -159,7 +148,6 @@ func displayWidgets() {
 	if displayBuild && displayGitHub {
 		github := getGitHub()
 		jenkins := getJenkins()
-		travis := getTravis()
 
 		grid.Set(
 			ui.NewRow(1.0/9,
@@ -169,20 +157,17 @@ func displayWidgets() {
 				ui.NewCol(1.0, github),
 			),
 			ui.NewRow(4.5/10,
-				ui.NewCol(1.0/2, travis),
-				ui.NewCol(1.0/2, jenkins),
+				ui.NewCol(1.0, jenkins),
 			),
 		)
 	} else if displayBuild && !displayGitHub {
 		jenkins := getJenkins()
-		travis := getTravis()
 		grid.Set(
 			ui.NewRow(1.0/9,
 				getDateTime(),
 			),
 			ui.NewRow(9.0/10,
-				ui.NewCol(1.0/2, travis),
-				ui.NewCol(1.0/2, jenkins),
+				ui.NewCol(1.0, jenkins),
 			),
 		)
 	} else if displayGitHub && !displayBuild {
