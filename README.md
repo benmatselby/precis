@@ -7,7 +7,6 @@ CLI application for getting information out of various systems in a neat dashboa
 It integrates with:
 
 - GitHub
-- TravisCI
 - Jenkins
 
 ## Usage
@@ -25,7 +24,7 @@ A terminal dashboard which gives an overview of useful things
 Build:
 
   -display-build
-        Do you want to show build information from TravisCI and Jenkins? (default true)
+        Do you want to show build information from Jenkins? (default true)
   -display-github
     	Do you want to show GitHub information? (default true)
   -github-owner string
@@ -42,10 +41,6 @@ Build:
     	The Jenkins username to authenticate with (or define env var JENKINS_USERNAME)
   -jenkins-view string
     	The Jenkins view you want render, otherwise it is all (or define env var JENKINS_VIEW)
-  -travis-owner string
-    	The Travis CI owner (or define env var TRAVIS_CI_OWNER)
-  -travis-token string
-    	The Travis CI authentication token (or define env var TRAVIS_CI_TOKEN)
 ```
 
 ## Requirements
@@ -59,8 +54,6 @@ If you are wanting to build and develop this, you will need the following items 
 You will need the following environment variables defining, depending on which systems you are running in the dashboard:
 
 ```shell
-export TRAVIS_CI_TOKEN=""
-export TRAVIS_CI_OWNER=""
 export GITHUB_TOKEN=""
 export GITHUB_OWNER=""
 export JENKINS_URL=""
@@ -70,14 +63,6 @@ export JENKINS_VIEW=""
 ```
 
 You can also define `~/.benmatselby/precis.yml` which has various settings.
-
-### Ignoring certain repos in Travis
-
-```shell
-travis:
-  ignore_repos:
-    - benmatselby/atom-php-checkstyle
-```
 
 ### Limiting the repos to show Pull Requests for
 
